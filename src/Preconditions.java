@@ -3,32 +3,30 @@ import java.util.ArrayList;
 public class Preconditions
 {
 	private String precondition;
-	ArrayList <String>  obj = new ArrayList <String>();
-	
-	
-	public Preconditions()
+	ArrayList <String>  preconditionArray = new ArrayList <String>();
+//	
+//	
+//	public Preconditions()
+//	{
+//		//this.obj = new ArrayList <String>();
+//		
+//		this.precondition = precondition;
+//	}
+//	
+	/**
+	 * Adding preconditions to the arraylist of preconditions
+	 * @param precondition
+	 */
+	public void addPrecondition(String precondition)
 	{
-		//this.obj = new ArrayList <String>();
-		
-		this.precondition = precondition;
+		preconditionArray.add(precondition);
 	}
 	
 	
-	public void addPreconditions(String precondition)
+	public String getPrecondition(int index)
 	{
-		obj.add(precondition);
+		return preconditionArray.get(index);
 	}
 	
-	
-	public String getPreconditions()
-	{
-		return precondition;
-	}
-	
-	public void setPreconditions(String precondition)
-	{
-		this.precondition = precondition;
-	}
-
 
 }
