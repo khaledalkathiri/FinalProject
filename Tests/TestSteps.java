@@ -7,182 +7,10 @@ import org.junit.Test;
 
 public class TestSteps 
 {
+
+	
 	@Test
 	public void testInitlization()
-	{
-		Preconditions preconditions = new Preconditions();
-		Effects effects = new Effects();
-		
-		String effect1 = "Have Drill";
-		String precondition1 = "At Hardware";
-		String precondition2 = "Sells Drill";
-		
-		
-		//adding the effects and preconditions
-		effects.effectArray.add(effect1);
-		preconditions.preconditionArray.add(precondition1);
-		preconditions.preconditionArray.add(precondition2);
-		
-	
-		Steps s1 = new Steps(effects,preconditions);
-		s1.steps.add(s1);
-		
-		assertEquals("Have Drill", s1.getEffects(0, 0));
-		assertEquals("At Hardware", s1.getPreconditions(0,0));
-		assertEquals("Sells Drill", s1.getPreconditions(0,1));
-
-	}
-	
-	@Test
-	public void testaddingMoreSteps()
-	{
-		Preconditions preconditions = new Preconditions();
-		Effects effects = new Effects();
-		
-		String effect1 = "Have Drill";
-		String precondition1 = "At Hardware";
-		String precondition2 = "Sells Drill";
-		
-		
-		//adding the effects and preconditions
-		effects.effectArray.add(effect1);
-		preconditions.preconditionArray.add(precondition1);
-		preconditions.preconditionArray.add(precondition2);
-		
-		Steps s1 = new Steps(effects,preconditions);
-		s1.steps.add(s1);
-		
-		
-		
-		//Testing the first step
-		assertEquals("Have Drill", s1.getEffects(0,0));
-		assertEquals("At Hardware", s1.getPreconditions(0,0));
-		assertEquals("Sells Drill", s1.getPreconditions(0,1));
-		
-		
-		//The second step
-		String effect2 = "Have Milk";
-		String precondition3 = "At supermarket";
-		String precondition4 = "Sells Milk";
-		
-		effects.effectArray.add(effect2);
-		preconditions.preconditionArray.add(precondition3);
-		preconditions.preconditionArray.add(precondition4);
-		effects.addEffect(effect2);
-		
-		Steps s2 = new Steps(effects,preconditions);
-		s2.steps.add(s2);
-		s2.addEffects(effect2);
-
-		
-
-
-		//Testing the second step
-		assertEquals("Have Milk", s2.getEffects(0,0));
-		assertEquals("At supermarket", s2.getPreconditions(1,0));
-		assertEquals("Sells Milk", s2.getPreconditions(1,1));
-
-	}
-	
-//	@Test
-//	public void testMEEEEE()
-//	{
-//		
-//		//Preconditions preconditions = new Preconditions();
-//		//Effects effects = new Effects();
-//		
-//		String effect1 = "Have Drill";
-//		String precondition1 = "At Hardware";
-//		String precondition2 = "Sells Drill";
-//		
-//		Steps s1 = new Steps(effects,preconditions);
-//		assertTrue(s1.steps.add(s1));
-//		
-//		s1.addEffects(effect1);
-//		s1.addPreconditions(precondition1);
-//		s1.addPreconditions(precondition2);
-//		
-//		assertEquals("Have Drill", s1.getEffects(0, 0));
-//		assertEquals("At Hardware", s1.getPreconditions(0,0));
-//		assertEquals("Sells Drill", s1.getPreconditions(0,1));
-//		
-//		
-//
-//		//The second step
-//		String effect2 = "Have Milk";
-//		String precondition3 = "At supermarket";
-//		String precondition4 = "Sells Milk";
-//		
-//		Steps s2 = new Steps(effects,preconditions);
-//
-//		s2.addEffects(effect2);
-//		s2.addPreconditions(precondition3);
-//		s2.addPreconditions(precondition4);
-//		
-//		assertTrue(s2.steps.add(s2));
-//		System.out.println(s2.getEffects(0, 1));
-//
-//		
-//		//Testing the second step
-//		assertEquals("Have Milk", s2.getEffects(0,1));
-//		assertEquals("At supermarket", s2.getPreconditions(0,0));
-//		assertEquals("Sells Milk", s2.getPreconditions(1,1));
-//
-//		
-//	}
-	
-	
-	@Test
-	public void testInitilaizingSteps()
-	{
-		
-		//Preconditions preconditions = new Preconditions();
-		//Effects effects = new Effects();
-		
-		String effect1 = "Have Drill";
-		String precondition1 = "At Hardware";
-		String precondition2 = "Sells Drill";
-		
-		Steps s1 = new Steps();
-		assertTrue(s1.steps.add(s1));
-		
-		s1.addEffects(effect1);
-		s1.addPreconditions(precondition1);
-		s1.addPreconditions(precondition2);
-		
-		assertEquals("Have Drill", s1.getEffects(0, 0));
-		assertEquals("At Hardware", s1.getPreconditions(0,0));
-		assertEquals("Sells Drill", s1.getPreconditions(0,1));
-		
-		
-
-		//The second step
-		String effect2 = "Have Milk";
-		String precondition3 = "At supermarket";
-		String precondition4 = "Sells Milk";
-		
-		Steps s2 = new Steps();
-
-		s2.addEffects(effect2);
-		s2.addPreconditions(precondition3);
-		s2.addPreconditions(precondition4);
-		
-		assertTrue(s2.steps.add(s2));
-		System.out.println(s2.getEffects(0, 0));
-		System.out.println(s1.getEffects(0, 0));
-
-		
-		//Testing the second step
-		assertEquals("Have Milk", s2.getEffects(0,0));
-		assertEquals("At supermarket", s2.getPreconditions(0,0));
-		assertEquals("Sells Milk", s2.getPreconditions(0,1));
-
-		
-	}
-
-	
-	@Test
-	public void testNEWstep()
 	{
 		Planner s = new Planner();
 		Effects initialEffects = new Effects();
@@ -246,6 +74,12 @@ public class TestSteps
 		
 
 
+	}
+	
+	@Test
+	public void testSearching()
+	{
+		
 	}
 
 }

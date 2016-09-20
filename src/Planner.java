@@ -46,4 +46,9 @@ public class Planner
 		steps.add(s);
 	}
 	
+	public void searchSteps(Object step)
+	{
+		
+	}
+	
 }

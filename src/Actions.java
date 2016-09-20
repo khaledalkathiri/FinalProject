@@ -13,7 +13,6 @@ public class Actions
 	//NOT used properly yet
 	ArrayList<Actions>  obj = new ArrayList<Actions>();
 	
-	Hashtable <Actions, precondions, effects> hashtable = new hashtable <Actions, precondions, effects>();
 	
 	
 	/*

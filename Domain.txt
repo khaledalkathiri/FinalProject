@@ -1,6 +1,6 @@
 (define (domain air-cargo)
   (:predicates (In ?obj ?place)(At ?obj ?place)(Cargo ?obj)(Plane ?obj) (Airport ?obj))
-
+  
   (:action LOAD
      :parameters (?c ?p ?a)
      :precondition (and (At ?c ?a) (At ?p ?a) (Cargo ?c) (Plane ?p) (Airport ?a))
@@ -16,3 +16,6 @@
      :precondition (and (At ?p ?from) (Plane ?p) (Airport ?from) (Airport ?to))
      :effect (and (At ?p ?to) (not (At ?p ?from))))
   )
+  
+  
+  "alkathiri"
