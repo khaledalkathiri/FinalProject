@@ -17,5 +17,3 @@
      :effect (and (At ?p ?to) (not (At ?p ?from))))
   )
   
-  
-  "alkathiri"
