@@ -13,14 +13,17 @@ public class TestSteps
 	public void testInitlization()
 	{
 		Planner s = new Planner();
-		Effects initialEffects = new Effects();
+		//Effects initialEffects = new Effects();
 		String initialEffects1 = "At Home";
 		String initialEffects2 = "Has Money";
 
-		Step intialState = new Step(1,"initialState",null,initialEffects);
+		Step intialState = new Step("initialState",null,null);
 
-		initialEffects.addEffect(initialEffects1);
-		initialEffects.addEffect(initialEffects2);
+		intialState.addEffects(initialEffects1);
+		intialState.addEffects(initialEffects2);
+
+		//initialEffects.addEffect(initialEffects1);
+		//initialEffects.addEffect(initialEffects2);
 
 		
 		s.addIntialState(intialState);
@@ -37,7 +40,7 @@ public class TestSteps
 		String precondition1 = "At Hardware";
 		String precondition2 = "Sells Drill";
 		
-		Step step1 = new Step(0,"Buy Drill", preconditions,effects);
+		Step step1 = new Step("Buy Drill", preconditions,effects);
 
 		preconditions.addPrecondition(precondition1);
 		preconditions.addPrecondition(precondition2);
@@ -64,7 +67,7 @@ public class TestSteps
 		preconditions1.addPrecondition(precondition4);
 		effects1.addEffect(effect2);
 		
-		Step step2 = new Step(1,"Buy Milk", preconditions1,effects1);
+		Step step2 = new Step("Buy Milk", preconditions1,effects1);
 		
 		assertEquals("Have Milk",step2.getEffects(0));
 		assertEquals("At supermarket",step2.getPreconditions(0));
@@ -79,6 +82,7 @@ public class TestSteps
 	@Test
 	public void testSearching()
 	{
+		
 		
 	}
 

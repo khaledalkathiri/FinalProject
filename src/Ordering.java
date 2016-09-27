@@ -1,6 +1,6 @@
 
 
-//when we connect two 
+//when we connect two steps
 public class Ordering 
 {
 	

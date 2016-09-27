@@ -8,13 +8,21 @@ import java.util.regex.Pattern;
 public class MainClass 
 {
 	
-	    public static void main(String [] args) throws FileNotFoundException 
+	   	//private static final String String = null;
+		//private static final Preconditions Preconditions = null;
+		//private static final Effects Effects = null;
+
+		public static void main(String [] args) throws FileNotFoundException 
 	    {
 	    	String domainName = "Domain.txt";
 	    	String ProblemName = "Problem.txt";
 
+	    	
+	    	
+	    	//Step s = new Step(String , Preconditions , Effects );
 	    	Parser p = new Parser();
 	    	p.parseDomain(domainName);
+	    	//p.printout(1);
 	    	//p.parseProblem(ProblemName);
 	    	
 //	        // The name of the file to open.
