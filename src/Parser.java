@@ -85,7 +85,7 @@ public class Parser
 				if(ActionLine.contains(parameters))
 				{
 					ParameterStyle = ActionLine.split(parameters);
-					System.out.println(ParameterStyle[1]);
+						//System.out.println(ParameterStyle[1]);
 					ActionLine = scan.nextLine();
 				}
 				
@@ -93,15 +93,15 @@ public class Parser
 				if(ActionLine.contains(precondition))
 				{
 					ActionPrecondition= ActionLine.split(delims);
-					System.out.println("Preconditions:  ");
+						//System.out.println("Preconditions:  ");
 
 					Matcher pre = Pattern.compile("\\(([^)]+)\\)").matcher(ActionPrecondition[1]);
 					while(pre.find())
 					{
 						//adding the preconditions to the step
 						step.addPreconditions(pre.group(1));
-						System.out.print(pre.group(1));  
-						System.out.print("  \t");
+							//System.out.print(pre.group(1));  
+							//System.out.print("  \t");
 
 					}
 					ActionLine = scan.nextLine();
@@ -113,7 +113,7 @@ public class Parser
 				if(ActionLine.contains(effect))
 				{
 					ActionEffect = ActionLine.split(delims);
-					System.out.println("Effects:  ");
+						//System.out.println("Effects:  ");
 
 
 					Matcher ef = Pattern.compile("\\(([^)]+)\\)").matcher(ActionEffect[1]);
@@ -121,15 +121,15 @@ public class Parser
 					{    
 						//adding the effects to the step
 						step.addEffects(ef.group(1));
-						System.out.print(ef.group(1));
-						System.out.print("  \t");
+							//System.out.print(ef.group(1));
+							//System.out.print("  \t");
 					}
 
 				}
 				
 				//adding the step to the arrayList of steps
 				ActionsDomain.add(step);
-				System.out.println("\n");
+					//System.out.println("\n");
 			}
 		}
 	}
@@ -152,14 +152,13 @@ public class Parser
 		while(scan.hasNextLine())
 		{
 			String line = scan.nextLine();
-			//System.out.println(line);
 
 			
 			if(line.contains(initialState))
 			{
 				step = new Step(null, null, null);
 
-				System.out.println("Initial State: ");
+					//System.out.println("Initial State: ");
 
 				initialStateLitrals = line.split(initialState);
 				
@@ -168,7 +167,7 @@ public class Parser
 				while(litrals.find())
 				{      
 					step.addEffects(litrals.group(1));
-					System.out.println(litrals.group(1));
+						//System.out.println(litrals.group(1));
 				}
 				line = scan.nextLine();
 				ProblemDomain.add(0, step);
@@ -179,14 +178,13 @@ public class Parser
 				step = new Step(null, null, null);
 
 				goalStateLitrals = line.split(delims);
-				//System.out.println(goalStateLitrals[1]);
-				System.out.println("\nGoal: ");
+					//System.out.println("\nGoal: ");
 				step.addStepName(goalState);
 				Matcher litrals = Pattern.compile("\\(([^)]+)\\)").matcher(goalStateLitrals[1]);
 				while(litrals.find())
 				{       
 					step.addPreconditions(litrals.group(1));
-					System.out.println(litrals.group(1));
+						//System.out.println(litrals.group(1));
 				}
 				ProblemDomain.add(1, step);
 
@@ -272,6 +270,8 @@ public class Parser
 		return ActionsDomain.get(step).getEffects(index);
 	}
 	
+	
+	//Actions
 	/**
 	 * This function is to get the size of the ActionDomain
 	 * @return
@@ -281,5 +281,10 @@ public class Parser
 		return ActionsDomain.size();
 	}
 	
+	
+	public Step getAction(int index)
+	{
+		return ActionsDomain.get(index);
+	}
 }
 

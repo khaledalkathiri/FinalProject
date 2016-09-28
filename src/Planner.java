@@ -37,12 +37,6 @@ public class Planner
 		this.domainName = domainName;
 			
 		
-//		domainName = parser.getDomainName();
-		//parser = new Parser(domainName,problemName);
-		//parser.parseDomain(domainName);
-		//parser.parseProblem(problemName);
-		//parser.parseProblem(parser.getProblemName());
-		
 	}
 	
 	public void search() throws FileNotFoundException
@@ -54,7 +48,7 @@ public class Planner
 		this.addGoalOpenPrecondition();
 		
 		precondition = this.getOpenPrecondition();
-		this.searchActionDomain();
+		this.searchEffectsInActionDomain(precondition);
 		
 		
 		
@@ -78,8 +72,11 @@ public class Planner
 	}
 	
 	
-	
-	public void searchActionDomain()
+	/**
+	 * This function searches for an effect to solve an open precondition
+	 * @param precondition
+	 */
+	public void searchEffectsInActionDomain(String precondition)
 	{
 		int stepsNum = parser.getActionDomainSize();
 		int i;
@@ -89,13 +86,37 @@ public class Planner
 			int f;
 			for(f=0; f< effectNum; f++)
 			{
-				System.out.print(parser.getActionsEffects(i, f));
+				if(precondition.equals(parser.getActionsEffects(i, f)))
+				{
+					//adding the new action that satisfies the precondition to ations array
+					Actions.add(parser.getAction(i));
+					
+					//remove the preconditon from the queue
+					this.removeOpenPrecondition();
+					
+					//adding the new preconditions to the array of openPreconditons 
+					addPreconditions(i);
+					
+					//System.out.println(parser.getActionsEffects(i, f));
+				}
 			}
 		}
 	}
 	
-	
-	
+	/**
+	 * This function is to add preconditions to the openPreconditions queue
+	 * @param step
+	 */
+	public void addPreconditions(int step)
+	{
+		int preconditionsNum = parser.getActionsDomainPreconditionSize(step);
+		int i;
+		for(i=0; i<preconditionsNum;i++)
+		{
+			openPreconditions.addLast(parser.getActionsPreconditions(step, i));
+			System.out.println(parser.getActionsPreconditions(step, i));
+		}
+	}
 	
 	
 	
@@ -142,6 +163,8 @@ public class Planner
 	
 	
 	
+
+	
 	
 	
 	
@@ -172,10 +195,5 @@ public class Planner
 //		steps.add(s);
 //	}
 	
-	
-	public void searchSteps(Object step)
-	{
-		
-	}
 	
 }

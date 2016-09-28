@@ -93,7 +93,7 @@ public class TestParser
 		
 		
 		planner.search();
-		assertEquals("At C1 JFK",planner.removeOpenPrecondition());
+		//assertEquals("At C1 JFK",planner.removeOpenPrecondition());
 		assertEquals("At C2 SFO",planner.removeOpenPrecondition());
 
 		
