@@ -7,32 +7,18 @@ public class Step
 	//private  boolean executed;
 	private String name;
 	
+	private Literal literal;
 	
-	//private Preconditions precondition;
-	//private Effects effect;
-	//private Actions action;
-	
-	ArrayList <String>  preconditionArray = new ArrayList <String>();
-	ArrayList <String>  effectArray = new ArrayList <String>();
+	ArrayList <Literal>  preconditionArray = new ArrayList <Literal>();
+	ArrayList <Literal>  effectArray = new ArrayList <Literal>();
 
 	
-//	
-//	public Step(String name, Preconditions precondition, Effects effect)//boolean executed)
-//	{
-//		//this.index = index;
-//		this.name = name;
-//		this.effect = effect;
-//		this.precondition = precondition;
-//		
-//		//this.executed = executed;
-//		
-//	}
 	
 	
-	public Step(String name, ArrayList <String> preconditionArray, ArrayList <String>  effectArray)
+	public Step(String name, ArrayList <Literal> preconditionArray, ArrayList <Literal>  effectArray)
 	{
-		 this.preconditionArray = new ArrayList <String>();
-		 this.effectArray = new ArrayList <String>();
+		 this.preconditionArray = new ArrayList <Literal>();
+		 this.effectArray = new ArrayList <Literal>();
 		
 		this.name = name;		
 	}
@@ -51,24 +37,24 @@ public class Step
 	}
 	
 	
-	public String getEffects(int index)
+	public Literal getEffects(int index)
 	{
 		return effectArray.get(index);
 	}
 	
 	
-	public void addEffects(String effect)
+	public void addEffects(Literal effect)
 	{
 		 this.effectArray.add(effect);
 	}
 	
-	public String getPreconditions(int index)
+	public Literal getPreconditions(int index)
 	{
 		return preconditionArray.get(index);
 	}
 	
 	
-	public void addPreconditions(String precondition)
+	public void addPreconditions(Literal precondition)
 	{
 		 this.preconditionArray.add(precondition);
 	}
@@ -86,51 +72,6 @@ public class Step
 	
 
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	///OLD methods before I change the consturctor
-//	public String addStepName(String name)
-//	{
-//		return this.name = name;
-//	}
-//	
-//	
-//	public String getEffects(int index)
-//	{
-//		return effect.getEffect(index);
-//	}
-//	
-//	public void addEffects(String effect)
-//	{
-//		 this.effect.addEffect(effect);
-//	}
-//	
-//	public String getPreconditions(int index)
-//	{
-//		return precondition.getPrecondition(index);
-//	}
-//	
-//	
-//	/**
-//	 * adding preconditions
-//	 * @param precondition
-//	 */
-//	public void addPreconditions(String precondition)
-//	{
-//		 this.precondition.addPrecondition(precondition);
-//	}
 	
 	
 

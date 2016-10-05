@@ -17,8 +17,11 @@ public class Planner
 	
 	ArrayList <Step>  Actions = new ArrayList <Step>();
 	LinkedList <String> openPreconditions = new LinkedList <String>();
+
+
 	
 	private Parser parser;
+
 	
 	private String problemName;
 	private String domainName;
@@ -39,21 +42,22 @@ public class Planner
 		
 	}
 	
+	
+
+	
+	
 	public void search() throws FileNotFoundException
 	{
-		String precondition;
-		parser.parseProblem(problemName);
-		parser.parseDomain(domainName);
-
-		this.addGoalOpenPrecondition();
-		
-		precondition = this.getOpenPrecondition();
-		this.searchEffectsInActionDomain(precondition);
-		
-		
-		
+//		String precondition;
+//		parser.parseProblem(problemName);
+//		parser.parseDomain(domainName);
+//		
+//		this.addGoalOpenPrecondition();
+//		
+//		precondition = this.getOpenPrecondition();
+//		this.searchEffectsInActionDomain(precondition);
+			
 	}
-	
 	
 	
 	/**
@@ -63,12 +67,12 @@ public class Planner
 	public void addGoalOpenPrecondition() throws FileNotFoundException
 	{
 
-		int i;
-		for(i = 0; i < parser.getProblemDomainPreconditionSize(1); i++)
-		{
-			openPreconditions.addLast(parser.getGoalPreconditions(i));
-
-		}
+//		int i;
+//		for(i = 0; i < parser.getProblemDomainPreconditionSize(1); i++)
+//		{
+//			openPreconditions.addLast(parser.getGoalPreconditions(i));
+//
+//		}
 	}
 	
 	
@@ -113,7 +117,7 @@ public class Planner
 		int i;
 		for(i=0; i<preconditionsNum;i++)
 		{
-			openPreconditions.addLast(parser.getActionsPreconditions(step, i));
+			//openPreconditions.addLast(parser.getActionsPreconditions(step, i));
 			System.out.println(parser.getActionsPreconditions(step, i));
 		}
 	}
@@ -156,9 +160,9 @@ public class Planner
 		this.problemName =problemName;
 	}
 	
-	
-	
-	
+	/////////////////////////////////////////////////////////////////////////
+
+
 	
 	
 	

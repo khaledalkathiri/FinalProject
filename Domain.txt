@@ -1,19 +1,20 @@
 (define (domain air-cargo)
-  (:predicates (In ?obj ?place)(At ?obj ?place)(Cargo ?obj)(Plane ?obj) (Airport ?obj))
+  (:predicates (In ?c ?p)(At ?c ?a)(At ?p ?a)(Cargo ?c)(Plane ?p) (Airport ?a))
   
   (:action LOAD
-     :parameters (?cargo ?plane ?airport)
-     :precondition (and (At ?cargo ?airport) (At ?plane ?airport) (Cargo ?cargo) (Plane ?plane) (Airport ?airport))
-     :effect (and (In ?cargo ?plane) (not (At ?cargo ?airport))))
+     :parameters (?c ?p ?a)
+     :precondition (and (At ?c ?a) (At ?p ?a) (Cargo ?c) (Plane ?p) (Airport ?a))
+     :effect (and (In ?c ?p) (not (At ?c ?a))))
   
   (:action UNLOAD
      :parameters (?c ?p ?a)
      :precondition (and (In ?c ?p) (At ?p ?a) (Cargo ?c) (Plane ?p) (Airport ?a))
-     :effect (and (At C1 JFK) (not (In ?c ?p))))
+     :effect (and (At ?c ?a) (not (In ?c ?p))))
   
   (:action FLY
      :parameters (?p ?from ?to)
      :precondition (and (At ?p ?from) (Plane ?p) (Airport ?from) (Airport ?to))
      :effect (and (At ?p ?to) (not (At ?p ?from))))
   )
+  
   

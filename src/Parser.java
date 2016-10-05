@@ -13,16 +13,14 @@ public class Parser
 	private String parameters = "parameters";
 	private String precondition = "precondition";
 	private String effect = "effect";
-	//private String predicates = "predicates";
-
+	private String predicates = "predicates";
 	private String delims = "and";
 	private String[] ActionName = null;
 	private String[] ParameterStyle = null;
 	private String[] ActionPrecondition = null;
 	private String[] ActionEffect = null;
+	private String[] DomainPredicates = null;
 
-	
-	
 	
 	//instance variables for parsing the problem
 	private String initialState = "init";
@@ -36,17 +34,17 @@ public class Parser
 	private Step step;
 	
 	
-	
+	public ArrayList <Literal> PredicatesArray = new ArrayList <Literal>();	
 	private String name;
-	//private Preconditions precon;
-	//private Effects effe;
-	
+
+	private Literal literal;
 
 	
 	public Parser()//String domainName, String problemName)
 	{
 		this.ActionsDomain = new ArrayList <Step>();
 		this.ProblemDomain = new ArrayList <Step>();
+		this.PredicatesArray = new ArrayList <Literal>();
 		//this.problemName = problemName;
 		//this.domainName = domainName;
 	}
@@ -59,21 +57,41 @@ public class Parser
 	 */
 	public void parseDomain(String fileName) throws FileNotFoundException
 	{
-		//fileName = domainName;
 		
 		File text = new File(fileName);
-
 		Scanner scan = new Scanner(text);
+		
 		while(scan.hasNextLine())
 		{
-			
 			step = new Step(null, null, null);
 			
 			String line = scan.nextLine();
+			
+			if(line.contains(predicates))
+			{
+				DomainPredicates = line.split(predicates);
+				
+				Matcher predicate = Pattern.compile("\\(([^)]+)\\)").matcher(DomainPredicates[1]);
+				while(predicate.find())
+				{
+					//adding the preconditions to the step
+					literal = new Literal(null,null);
+					Literal s = literal.parseStringToLiteral(predicate.group(1)); 
+
+					PredicatesArray.add(s);
+						//System.out.println(s.getLiteralParameters(0));  
+						//System.out.print("  \t");
+
+				}
+				
+			}
+			//System.out.print("  \n");
+
+			
 			if(line.contains(action))
 			{
 				ActionName = line.split(action);
-				System.out.print(ActionName[1] +"  ");
+					//System.out.print(ActionName[1] +"  ");
 				name = ActionName[1];
 				
 				//adding the action name to the step
@@ -99,15 +117,23 @@ public class Parser
 					while(pre.find())
 					{
 						//adding the preconditions to the step
-						step.addPreconditions(pre.group(1));
-							//System.out.print(pre.group(1));  
-							//System.out.print("  \t");
+						//System.out.print(pre.group(1));  
+						literal = new Literal(null,null);
+
+						Literal s = literal.parseStringToLiteral(pre.group(1)); 
+							//System.out.println(pre.group(1));
+						step.addPreconditions(s);
+							//System.out.print(s.getLiteralName()); 
+							//System.out.println(s.getLiteralParameters(0)); 
+
+							//System.out.print("  \t	");
 
 					}
 					ActionLine = scan.nextLine();
 				}
-				System.out.println("");
+				//System.out.println("");
 
+				
 				
 				//Action Effects
 				if(ActionLine.contains(effect))
@@ -120,8 +146,9 @@ public class Parser
 					while(ef.find())
 					{    
 						//adding the effects to the step
-						step.addEffects(ef.group(1));
-							//System.out.print(ef.group(1));
+						Literal s = literal.parseStringToLiteral(ef.group(1));
+						step.addEffects(s);
+							//System.out.print(s.getLiteralName());
 							//System.out.print("  \t");
 					}
 
@@ -144,11 +171,10 @@ public class Parser
 	public void parseProblem(String fileName) throws FileNotFoundException
 	{
 		//fileName = problemName;
-		
-		File text = new File(fileName);
 
+		File text = new File(fileName);
 		Scanner scan = new Scanner(text);
-		
+
 		while(scan.hasNextLine())
 		{
 			String line = scan.nextLine();
@@ -157,6 +183,8 @@ public class Parser
 			if(line.contains(initialState))
 			{
 				step = new Step(null, null, null);
+				literal = new Literal(null,null);
+
 
 					//System.out.println("Initial State: ");
 
@@ -166,8 +194,12 @@ public class Parser
 				Matcher litrals = Pattern.compile("\\(([^)]+)\\)").matcher(initialStateLitrals[1]);
 				while(litrals.find())
 				{      
-					step.addEffects(litrals.group(1));
-						//System.out.println(litrals.group(1));
+					//step.addEffects(litrals.group(1));
+						//int numOfPara =literal.searchInPredicateArray(this,litrals.group(1));
+						Literal s = literal.parseStringToLiteral(litrals.group(1));	
+						//System.out.println(s.getLiteralParameters(0));
+						step.addEffects(s);
+
 				}
 				line = scan.nextLine();
 				ProblemDomain.add(0, step);
@@ -182,8 +214,10 @@ public class Parser
 				step.addStepName(goalState);
 				Matcher litrals = Pattern.compile("\\(([^)]+)\\)").matcher(goalStateLitrals[1]);
 				while(litrals.find())
-				{       
-					step.addPreconditions(litrals.group(1));
+				{     
+					Literal s = literal.parseStringToLiteral(litrals.group(1));	
+					step.addPreconditions(s);
+					//step.addPreconditions(litrals.group(1));
 						//System.out.println(litrals.group(1));
 				}
 				ProblemDomain.add(1, step);
@@ -198,13 +232,13 @@ public class Parser
 	
 	
 	
-	
+	//Domain File
 	/**
 	 * This function is to get the goal preconditions in the ProblemDomain
 	 * @param index
 	 * @return
 	 */
-	public String getGoalPreconditions(int index)
+	public Literal getGoalPreconditions(int index)
 	{
 		return ProblemDomain.get(1).getPreconditions(index);
 	}
@@ -212,7 +246,7 @@ public class Parser
 	
 	
 	/**
-	 * This function will return the size of the precondition in the problem domain
+	 * This function will return the size of the precondition(Goal state) in the problem domain
 	 * @param index
 	 * @return
 	 */
@@ -222,6 +256,21 @@ public class Parser
 	}
 
 	
+	/**
+	 * This function will return the size of the effects(initial state) in the problem domain
+	 * @param index
+	 * @return
+	 */
+	public int getProblemDomainEffectsSize(int index)
+	{
+		return ProblemDomain.get(index).getEffectsSize();
+	}
+	
+	
+	public Literal getIntialStateEffects(int index)
+	{
+		return ProblemDomain.get(0).getEffects(index);
+	}
 	
 	
 	//Preconditions
@@ -242,7 +291,7 @@ public class Parser
 	 * @param index
 	 * @return
 	 */
-	public String getActionsPreconditions(int step, int index)
+	public Literal getActionsPreconditions(int step, int index)
 	{
 		return ActionsDomain.get(step).getPreconditions(index);
 	}
@@ -265,7 +314,7 @@ public class Parser
 	 * @param index
 	 * @return
 	 */
-	public String getActionsEffects(int step, int index)
+	public Literal getActionsEffects(int step, int index)
 	{
 		return ActionsDomain.get(step).getEffects(index);
 	}
@@ -286,5 +335,25 @@ public class Parser
 	{
 		return ActionsDomain.get(index);
 	}
+	
+	
+	//Predicates
+	public Literal getPredicates(int index)
+	{
+		return PredicatesArray.get(index);
+	}
+	
+	public int SizePredicatesArray()
+	{
+		return PredicatesArray.size();
+	}
+
+
+////////////////////////////////////////////NEXT \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+
+	
+	
+	
 }
 

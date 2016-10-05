@@ -1,0 +1,15 @@
+
+
+(define (domain shoppingDomain)
+  (:predicates (Have ?x) (At ?x) (Sells ?store ?x))
+  
+  (:action BUY
+     :parameters (?x ?store)
+     :precondition (and (At ?store) (Sells ?store ?x))
+     :effect (and (Have(x))))
+     
+  (:action Go
+     :parameters (?x ?y)
+     :precondition (and (At ?x)) 
+     :effect (and (At(y)) (not(At(x))))
+  

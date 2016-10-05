@@ -14,7 +14,7 @@ public class Ordering
 		this.before = before;
 		this.after = after;
 	}
-	
+
 	
 	
 
