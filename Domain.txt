@@ -4,17 +4,17 @@
   (:action LOAD
      :parameters (?c ?p ?a)
      :precondition (and (At ?c ?a) (At ?p ?a) (Cargo ?c) (Plane ?p) (Airport ?a))
-     :effect (and (In ?c ?p) (not (At ?c ?a))))
+     :effect (and (In ?c ?p) (not At ?c ?a))))
   
   (:action UNLOAD
      :parameters (?c ?p ?a)
      :precondition (and (In ?c ?p) (At ?p ?a) (Cargo ?c) (Plane ?p) (Airport ?a))
-     :effect (and (At ?c ?a) (not (In ?c ?p))))
+     :effect (and (At ?c ?a) (not In ?c ?p))))
   
   (:action FLY
      :parameters (?p ?from ?to)
      :precondition (and (At ?p ?from) (Plane ?p) (Airport ?from) (Airport ?to))
-     :effect (and (At ?p ?to) (not (At ?p ?from))))
+     :effect (and (At ?p ?to) (not At ?p ?from))))
   )
   
   
