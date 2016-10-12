@@ -8,8 +8,9 @@ public class Binding
 	
 	public Binding(Step variable, Literal precondition)
 	{
-		this.precondition = precondition;
 		this.variable = variable;
+		this.precondition = precondition;
+
 	}
 	
 	
@@ -74,7 +75,25 @@ public class Binding
 	
 	public boolean isBounded(Literal literal)
 	{
-		return false;
+		int size = literal.sizeLiteralParameters();
+		for(int i =0; i< size;i++)
+		{
+			if(literal.getLiteralParameters(i).contains("?"))
+				return false;
+		}
+		return true;
+	}
+	
+	
+	public int checkParaNotBounded(Literal literal)
+	{
+		int size = literal.sizeLiteralParameters();
+		for(int i =0; i< size;i++)
+		{
+			if(literal.getLiteralParameters(i).contains("?"))
+				return i;
+		}
+		return 0;
 	}
 
 

@@ -108,8 +108,8 @@ public class Digraph<V>
      * Main program (for testing).
      * @throws FileNotFoundException 
      */
-    public static void main (String[] args) throws FileNotFoundException {
-        // Create a Graph with Integer nodes
+    public static void main (String[] args) throws FileNotFoundException
+    {
         Digraph<Step> graph = new Digraph<Step>();
         Step step = new Step(null,null,null);
         Parser p = new Parser();
