@@ -100,6 +100,28 @@ public class TestParser
 
 	}
 	
+	
+	@Test 
+	public void testParsingPredicates() throws FileNotFoundException
+	{
+		String domainName = "Domain.txt";
+
+		Parser p = new Parser();
+		p.parseDomain(domainName);
+		
+		assertEquals("In ?c ?p", p.PredicatesArray.get(0).toString());
+		assertEquals("CargoAt ?c ?a", p.PredicatesArray.get(1).toString());
+		
+		Literal literal = p.ActionsDomain.get(0).getPreconditions(0);
+		assertEquals("CargoAt ?c ?a", literal.toString());
+		assertEquals(true,p.PredicatesArray.contains(literal));
+
+		literal.setLiteralParameters(0, "C1");
+		assertEquals("CargoAt C1 ?a",literal.toString());
+		assertEquals(2,p.countParaInPredicate(literal));
+
+	}
+	
 
 	@Test
 	public void testSettingLiteralPara() throws FileNotFoundException
@@ -150,6 +172,56 @@ public class TestParser
 
 	}
 	
+	@Test
+	public void bindNextVariable()throws FileNotFoundException
+	{
+		Parser parser = new Parser();
+		String domainName = "Domain.txt";
+		String problemName = "Problem.txt";
+		parser.parseDomain(domainName);
+		parser.parseProblem(problemName);
+		
+		Planner planner = new Planner(parser);
+		Binding binding = new Binding(parser);
+		
+		assertEquals("Cargo C1", parser.getIntialStateEffects(0).toString());
+		assertEquals("CargoAt C1 JFK", parser.getGoalPreconditions(0).toString());
+		assertFalse(planner.searchEffectInInitialState(parser.getGoalPreconditions(0)));
+		
+		Step unload = parser.ActionsDomain.get(1);
+		assertEquals(" UNLOAD",unload.getStepName());
+		assertEquals("In ?c ?p", unload.getPreconditions(0).toString());
+		assertEquals("PlaneAt ?p ?a",unload.getPreconditions(1).toString());
+		assertEquals("Cargo ?c", unload.getPreconditions(2).toString());
+		assertEquals("Plane ?p", unload.getPreconditions(3).toString());
+		assertEquals("Airport ?a", unload.getPreconditions(4).toString());
+		assertEquals("CargoAt ?c ?a", unload.getEffects(0).toString());
+		assertEquals("In ?c ?p", unload.getEffects(1).toString());
+		
+		Step load = parser.ActionsDomain.get(0);
+		assertEquals(" LOAD",load.getStepName());
+		assertEquals("CargoAt ?c ?a", load.getPreconditions(0).toString());
+		assertEquals("PlaneAt ?p ?a", load.getPreconditions(1).toString());
+		assertEquals("Cargo ?c", load.getPreconditions(2).toString());
+		assertEquals("Plane ?p", load.getPreconditions(3).toString());
+		assertEquals("Airport ?a", load.getPreconditions(4).toString());
+		assertEquals("In ?c ?p", load.getEffects(0).toString());
+		assertEquals("CargoAt ?c ?a", load.getEffects(1).toString());
+		
+		
+		//In C1 ?p
+		
+		Literal literal = load.getEffects(0);
+		literal.setLiteralParameters(0, "?c");
+		literal.setLiteralParameters(1, "SFO");
+		//assertEquals("In C1 SFO",literal.toString());
+		
+		binding.bindNextLiterals(load, literal);
+		assertFalse(binding.isBounded(literal));
+		//binding.bindLiterals(load, precondition, effectNum);
+
+	}
+	
 	
 	@Test
 	public void testBinding() throws FileNotFoundException
@@ -164,7 +236,7 @@ public class TestParser
 		parser.parseProblem(problemName);
 		
 		Planner planner = new Planner(parser);
-		Binding binding = new Binding(null, null);
+		Binding binding = new Binding(parser);
 		
 		Step unload = parser.ActionsDomain.get(1);
 		Literal precondition = parser.getGoalPreconditions(0);

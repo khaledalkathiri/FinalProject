@@ -18,4 +18,5 @@
         
   (:init (Cargo C1) (Cargo C2) (Plane P1) (Plane P2) (Airport SFO) (Airport JFK) (CargoAt C1 SFO) (CargoAt C2 JFK) (PlanAt P1 SFO) (PlanAt P2 JFK))
 
-  (:goal (and (CargoAt C1 JFK) (CargoAt C2 SFO))))
+  (:goal (and (CargoAt C1 JFK) 
+  (CargoAt C2 SFO))))

@@ -404,11 +404,26 @@ public class Parser
 		return PredicatesArray.size();
 	}
 
-
-////////////////////////////////////////////NEXT \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
 	
 	
+	/**
+	 * This method is to return the size of parameters in each method
+	 * @param name
+	 * @return
+	 */
+	public int countParaInPredicate(Literal name)
+	{
+		int size=0;
+		if(PredicatesArray.contains(name.getLiteralName()))
+		{
+			size = name.sizeLiteralParameters();
+			System.out.println(size);
+		}
+		
+		
+		return size;
+	}
+
 	
 }
 

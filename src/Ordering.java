@@ -11,7 +11,7 @@ public class Ordering
 
 
 	//LinkedList <String> openPreconditions = new LinkedList <String>();
-	private Map <Step, List<Step>> neighbors = new HashMap<Step,List<Step>>();
+	 Map <Step, List<Step>> neighbors = new HashMap<Step,List<Step>>();
 
 
 
@@ -34,5 +34,13 @@ public class Ordering
 		this.add(to);
 		neighbors.get(from).add(to);
 	}
+	
+    public String toString () 
+    {
+        StringBuffer s = new StringBuffer();
+        for (Step v: neighbors.keySet())
+        	s.append("\n    " + v.getStepName() + " -> " + neighbors.get(v.getStepName()));
+        return s.toString();                
+    }
 
 }

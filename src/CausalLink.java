@@ -26,7 +26,7 @@ public class CausalLink
 	
 	public void addLink(Step newStep, Literal precondition, Step oldStep)
 	{
-		this.precondition.setExcuted(true);
+		precondition.setExcuted(true);
 		//System.out.println("it's excuted");
 			
 			

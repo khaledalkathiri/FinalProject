@@ -8,18 +8,12 @@ import java.util.Map;
 
 public class Planner 
 {
-
-
-
-
-
 	HashMap <Integer, Step> id = new HashMap<Integer, Step>();
 
 	LinkedList <Literal> openPreconditions = new LinkedList <Literal>();
 	LinkedList <Step> openPreconditionSteps = new LinkedList <Step>();		//parallel to the openPrecondition
 	ArrayList <Step>  Actions = new ArrayList <Step>();
 	ArrayList <CausalLink>  Links = new ArrayList <CausalLink>();
-	ArrayList <ObjectInfo> temp = new ArrayList <ObjectInfo>();				//When we have more than one option
 
 
 
@@ -29,20 +23,21 @@ public class Planner
 	private Step step;
 	private CausalLink causalLink;
 	private Ordering ordering;
-	private ObjectInfo object;
+	private int key;
 
 
 	public Planner(Parser p) throws FileNotFoundException
 	{
 		id.put(0, p.getInitialState());
 		id.put(1, p.getGoalState());
+		this.key=2;
 		this.parser = p;
 		Actions = new ArrayList <Step>();
 		openPreconditions = new LinkedList <Literal>();
 		openPreconditionSteps = new LinkedList <Step>();
 
-		binding =new Binding(null,null);
-		//causalLink= new CausalLink(null,null);
+		binding =new Binding(parser);
+		causalLink= new CausalLink(null,null,null);
 		ordering = new Ordering();
 		ordering.add(p.getInitialState(), p.getGoalState());
 		
@@ -55,39 +50,49 @@ public class Planner
 	{
 		//using the bag method to shuffle all the actions in the Domain
 		//parser.randomizeActions();
-		
-		
+
+
 		Literal precondition;
 
 		//adding the goal preconditions to the queue
 		step = parser.getGoalState();
 		this.addGoalOpenPrecondition();
-		
 
 
-		//get the first open precondition in the queue
-		precondition = this.getOpenPrecondition();
-		
-		
-
-		//search for an effect in the initial state to satisfy it (if there is)
-		if(binding.isBounded(precondition))
+		int i = 0;
+		while(i<2)
 		{
-			boolean isFoundInIntialState = this.searchEffectInInitialState(precondition);
-			System.out.println(precondition.toString() + "  "+isFoundInIntialState);
+
+			//get the first open precondition in the queue
+			precondition = this.getOpenPrecondition();
+
+
+
+			//search for an effect in the initial state to satisfy it (if there is)
+			if(binding.isBounded(precondition))
+			{
+				boolean isFoundInIntialState = this.searchEffectInInitialState(precondition);
+				//System.out.println(precondition.toString() + "  "+isFoundInIntialState);
+			}
+			
+
+			//search for an action in the action domain to satisfy the open precondition
+			//add the action to the plan
+			this.searchEffectsInActionDomain(precondition);
+			//System.out.println(precondition.toString());
+
+
+//			for(Literal pre :openPreconditions)
+//			{
+//				System.out.println(pre.toString());
+//			}
+//
+//			System.out.println("\n\n");
+
+
+			i++;
 		}
 
-
-		
-		//search for an action in the action domain to satisfy the open precondition
-		//add the action to the plan
-		this.searchEffectsInActionDomain(precondition);
-
-
-		for(Literal pre :openPreconditions)
-		{
-			System.out.println(pre.toString());
-		}
 
 
 
@@ -107,7 +112,6 @@ public class Planner
 			openPreconditions.addLast(parser.getGoalPreconditions(i));
 			openPreconditionSteps.addLast(parser.getGoalState());
 			//System.out.println(openPreconditionSteps.get(0).getPreconditions(i).toString());
-
 			//System.out.println(openPreconditionSteps.size() + "		"+openPreconditions.size());
 
 		}
@@ -145,8 +149,7 @@ public class Planner
 	 */
 	public void searchEffectsInActionDomain(Literal precondition)
 	{
-		temp = new ArrayList <ObjectInfo>();
-		object = new ObjectInfo(0,0);
+		causalLink= new CausalLink(null,null,null);
 		int stepsNum = parser.getActionDomainSize();		//how many action in the domain
 		for(int i=0; i< stepsNum;i++)
 		{
@@ -159,27 +162,44 @@ public class Planner
 					//The literal is not negative
 					if(!(parser.getActionsEffects(i, f).isNegative()))
 					{
-						object = new ObjectInfo(i,f);
-						temp.add(object);
-						//temp.add(parser.getActionsEffects(i, f));
-						//System.out.print(parser.getActionsEffects(i, f).getLiteralName());
 						//System.out.println(parser.getActionsEffects(i, f).getLiteralParameters(0));
 						
 						//To get the step 
-						//step = parser.getAction(i);
+						step = parser.getAction(i);
 
 						//bind the variables 
-						//binding.bindLiterals(step, precondition , f);
-
+						binding.bindLiterals(step, precondition , f);
+						
+						//adding the new step to the array of actions
+						Actions.add(step);
+						id.put(key, step);
+						key++;
+						
+						//add causal Link
+						causalLink.addLink(step, precondition, openPreconditionSteps.getFirst());
+						Links.add(causalLink);
+						
 						//add ordering
-
+						ordering.add(step, openPreconditionSteps.getFirst());
 
 
 						//remove the precondition from the queue
-						//this.removeOpenPrecondition();
+						if(binding.isBounded(precondition))
+						{
+							System.out.println("dequuuuued --->"+precondition.toString());
+							this.removeOpenPrecondition();
+
+						}
+						else
+						{
+							//bind the next precondition to get the current precondition dequeued
+							binding.bindNextLiterals(step, precondition);
+							//System.out.println("Not bound"+ precondition.toString());
+							//System.out.println(step.getPreconditions(0).toString());
+						}
 
 						//adding the new preconditions to the array of openPreconditons 
-						//addPreconditions(step);
+						addPreconditions(step);
 					}
 					//System.out.println(parser.getAction(i).getStepName());
 
