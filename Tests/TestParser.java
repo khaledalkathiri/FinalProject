@@ -89,8 +89,8 @@ public class TestParser
 		assertEquals("Airport JFK",p.ProblemDomain.get(0).getEffects(5).toString());
 		assertEquals("CargoAt C1 SFO",p.ProblemDomain.get(0).getEffects(6).toString());
 		assertEquals("CargoAt C2 JFK",p.ProblemDomain.get(0).getEffects(7).toString());
-		assertEquals("PlanAt P1 SFO",p.ProblemDomain.get(0).getEffects(8).toString());
-		assertEquals("PlanAt P2 JFK",p.ProblemDomain.get(0).getEffects(9).toString());
+		assertEquals("PlaneAt P1 SFO",p.ProblemDomain.get(0).getEffects(8).toString());
+		assertEquals("PlaneAt P2 JFK",p.ProblemDomain.get(0).getEffects(9).toString());
 
 		//Goal State
 		assertEquals("goal",p.ProblemDomain.get(1).getStepName());
@@ -112,9 +112,14 @@ public class TestParser
 		assertEquals("In ?c ?p", p.PredicatesArray.get(0).toString());
 		assertEquals("CargoAt ?c ?a", p.PredicatesArray.get(1).toString());
 		
+		assertEquals("In ?c ?p", p.ActionsDomain.get(1).getPreconditions(0).toString());
+		assertEquals("CargoAt ?c ?a", p.ActionsDomain.get(0).getPreconditions(0).toString());
+
+		
 		Literal literal = p.ActionsDomain.get(0).getPreconditions(0);
 		assertEquals("CargoAt ?c ?a", literal.toString());
-		assertEquals(true,p.PredicatesArray.contains(literal));
+		assertEquals(true,p.predicateArrayHas(literal));
+
 
 		literal.setLiteralParameters(0, "C1");
 		assertEquals("CargoAt C1 ?a",literal.toString());
@@ -173,6 +178,55 @@ public class TestParser
 	}
 	
 	@Test
+	public void bindStepByPrecondition()throws FileNotFoundException
+	{
+		Parser parser = new Parser();
+		String domainName = "Domain.txt";
+		String problemName = "Problem.txt";
+		parser.parseDomain(domainName);
+		parser.parseProblem(problemName);
+		
+		Planner planner = new Planner(parser);
+		Binding binding = new Binding(parser);
+		
+		Literal openPreocodition = parser.getGoalPreconditions(0);
+		openPreocodition.setLiteralName("In");
+		openPreocodition.setLiteralParameters(0, "C1");
+		openPreocodition.setLiteralParameters(1,"?p");
+		
+		assertEquals("In C1 ?p", openPreocodition.toString());
+
+		
+		Step load = parser.ActionsDomain.get(0);
+		binding.bindLiterals(load, openPreocodition, 0);
+
+		assertEquals(" LOAD",load.getStepName());
+		assertEquals("CargoAt C1 ?a", load.getPreconditions(0).toString());
+		assertEquals("PlaneAt ?p ?a", load.getPreconditions(1).toString());
+		assertEquals("Cargo C1", load.getPreconditions(2).toString());
+		assertEquals("Plane ?p", load.getPreconditions(3).toString());
+		assertEquals("Airport ?a", load.getPreconditions(4).toString());
+		assertEquals("In C1 ?p", load.getEffects(0).toString());
+		assertEquals("CargoAt C1 ?a", load.getEffects(1).toString());
+		
+		openPreocodition.setLiteralParameters(1, "P1");
+		assertEquals("In C1 P1", openPreocodition.toString());
+
+		binding.bindStepByPreocndition(load, openPreocodition);
+		assertEquals(" LOAD",load.getStepName());
+		assertEquals("CargoAt C1 ?a", load.getPreconditions(0).toString());
+		assertEquals("PlaneAt P1 ?a", load.getPreconditions(1).toString());
+		assertEquals("Cargo C1", load.getPreconditions(2).toString());
+		assertEquals("Plane P1", load.getPreconditions(3).toString());
+		assertEquals("Airport ?a", load.getPreconditions(4).toString());
+		assertEquals("In C1 P1", load.getEffects(0).toString());
+		assertEquals("CargoAt C1 ?a", load.getEffects(1).toString());
+		
+
+		
+	}
+	
+	@Test
 	public void bindNextVariable()throws FileNotFoundException
 	{
 		Parser parser = new Parser();
@@ -187,7 +241,10 @@ public class TestParser
 		assertEquals("Cargo C1", parser.getIntialStateEffects(0).toString());
 		assertEquals("CargoAt C1 JFK", parser.getGoalPreconditions(0).toString());
 		assertFalse(planner.searchEffectInInitialState(parser.getGoalPreconditions(0)));
-		
+		Literal openPrecondition = parser.getGoalPreconditions(0);
+				
+				
+				
 		Step unload = parser.ActionsDomain.get(1);
 		assertEquals(" UNLOAD",unload.getStepName());
 		assertEquals("In ?c ?p", unload.getPreconditions(0).toString());
@@ -208,17 +265,49 @@ public class TestParser
 		assertEquals("In ?c ?p", load.getEffects(0).toString());
 		assertEquals("CargoAt ?c ?a", load.getEffects(1).toString());
 		
+		//Bind the first openPrecondition
+		binding.bindLiterals(unload, openPrecondition, 0);
+		assertEquals(" UNLOAD",unload.getStepName());
+		assertEquals("In C1 ?p", unload.getPreconditions(0).toString());
+		assertEquals("PlaneAt ?p JFK",unload.getPreconditions(1).toString());
+		assertEquals("Cargo C1", unload.getPreconditions(2).toString());
+		assertEquals("Plane ?p", unload.getPreconditions(3).toString());
+		assertEquals("Airport JFK", unload.getPreconditions(4).toString());
+		assertEquals("CargoAt C1 JFK", unload.getEffects(0).toString());
+		assertEquals("In C1 ?p", unload.getEffects(1).toString());
 		
-		//In C1 ?p
 		
-		Literal literal = load.getEffects(0);
-		literal.setLiteralParameters(0, "?c");
-		literal.setLiteralParameters(1, "SFO");
-		//assertEquals("In C1 SFO",literal.toString());
+		//Bind the next openPrecondition
+		openPrecondition = unload.getPreconditions(0);
+		//openPrecondition.setLiteralParameters(0, "C1");
+		assertEquals("In C1 ?p",openPrecondition.toString());
 		
-		binding.bindNextLiterals(load, literal);
-		assertFalse(binding.isBounded(literal));
-		//binding.bindLiterals(load, precondition, effectNum);
+		//The variables should be bounded right now but not fully bounded.
+		binding.bindLiterals(load, openPrecondition, 0);
+		assertEquals(" LOAD",load.getStepName());
+		assertEquals("CargoAt C1 ?a", load.getPreconditions(0).toString());
+		assertEquals("PlaneAt ?p ?a", load.getPreconditions(1).toString());
+		assertEquals("Cargo C1", load.getPreconditions(2).toString());
+		assertEquals("Plane ?p", load.getPreconditions(3).toString());
+		assertEquals("Airport ?a", load.getPreconditions(4).toString());
+		assertEquals("In C1 ?p", load.getEffects(0).toString());
+		assertEquals("CargoAt C1 ?a", load.getEffects(1).toString());
+		
+		assertEquals(false, binding.isBounded(openPrecondition));
+		binding.bindNextLiterals(load, openPrecondition);
+		
+		assertEquals(" LOAD",load.getStepName());
+		assertEquals("CargoAt C1 SFO", load.getPreconditions(0).toString());
+		assertEquals("PlaneAt P1 SFO", load.getPreconditions(1).toString());
+		assertEquals("Cargo C1", load.getPreconditions(2).toString());
+		assertEquals("Plane P1", load.getPreconditions(3).toString());
+		assertEquals("Airport SFO", load.getPreconditions(4).toString());
+		assertEquals("In C1 P1", load.getEffects(0).toString());
+		assertEquals("CargoAt C1 SFO", load.getEffects(1).toString());
+		
+		assertEquals("In C1 P1", openPrecondition.toString());
+		assertEquals(true, binding.isBounded(openPrecondition));
+		binding.bindLiterals(load, openPrecondition, 0);
 
 	}
 	
@@ -240,6 +329,7 @@ public class TestParser
 		
 		Step unload = parser.ActionsDomain.get(1);
 		Literal precondition = parser.getGoalPreconditions(0);
+		assertEquals("CargoAt C1 JFK", precondition.toString());
 		
 		assertEquals("In ?c ?p", unload.getPreconditions(0).toString());
 		assertEquals("PlaneAt ?p ?a", unload.getPreconditions(1).toString());
@@ -267,6 +357,28 @@ public class TestParser
 		
 		//To check which parameter is not bounded
 		assertEquals(1,binding.checkParaNotBounded(unload.getPreconditions(0))); //In C1 ?p
+		
+		
+		
+		
+		
+		//This is to test binding literals "Literals that are not fully bounded"
+		precondition.setLiteralParameters(0, "?c");
+		precondition.setLiteralParameters(1, "SFO");
+		assertEquals("CargoAt ?c SFO", precondition.toString());
+		assertFalse(binding.isBounded(precondition));
+
+		
+		binding.bindLiterals(unload, precondition, 0);
+
+		assertEquals("In ?c ?p", unload.getPreconditions(0).toString());
+		assertEquals("PlaneAt ?p SFO", unload.getPreconditions(1).toString());
+		assertEquals("Cargo ?c", unload.getPreconditions(2).toString());
+		assertEquals("Plane ?p", unload.getPreconditions(3).toString());
+		assertEquals("Airport SFO",unload.getPreconditions(4).toString());
+		assertEquals("CargoAt ?c SFO",unload.getEffects(0).toString());
+		assertEquals("In ?c ?p",unload.getEffects(1).toString());
+		
 
 	}
 	

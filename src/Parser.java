@@ -405,7 +405,24 @@ public class Parser
 	}
 
 	
-	
+
+	/**
+	 * 
+	 * @param lit
+	 * @return
+	 */
+	public boolean predicateArrayHas(Literal lit)
+	{
+		int i = this.SizePredicatesArray();
+		for(int f =0; f<i; f++)
+		{
+			String predicate = PredicatesArray.get(f).getLiteralName();
+			if(predicate.equals(lit.getLiteralName()))
+				return true;
+		}
+		
+		return false;
+	}
 	/**
 	 * This method is to return the size of parameters in each method
 	 * @param name
@@ -414,14 +431,34 @@ public class Parser
 	public int countParaInPredicate(Literal name)
 	{
 		int size=0;
-		if(PredicatesArray.contains(name.getLiteralName()))
+		if(this.predicateArrayHas(name))
 		{
+
 			size = name.sizeLiteralParameters();
-			System.out.println(size);
 		}
 		
 		
 		return size;
+	}
+	
+	
+	/**
+	 * This method return the predicate with the grounded letters
+	 * @param literal
+	 * @return
+	 */
+	public Literal getPredicate(Literal literal)
+	{
+		
+		int i = this.SizePredicatesArray();
+		for(int f =0; f<i; f++)
+		{
+			String predicate = PredicatesArray.get(f).getLiteralName();
+			if(predicate.equals(literal.getLiteralName()))
+				return PredicatesArray.get(f);
+		}
+				
+		return null;
 	}
 
 	

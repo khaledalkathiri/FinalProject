@@ -36,11 +36,11 @@ public class Planner
 		openPreconditions = new LinkedList <Literal>();
 		openPreconditionSteps = new LinkedList <Step>();
 
-		binding =new Binding(parser);
+		binding = new Binding(p);
 		causalLink= new CausalLink(null,null,null);
 		ordering = new Ordering();
 		ordering.add(p.getInitialState(), p.getGoalState());
-		
+
 	}
 
 
@@ -59,43 +59,43 @@ public class Planner
 		this.addGoalOpenPrecondition();
 
 
-		int i = 0;
-		while(i<2)
+		while(!(openPreconditions.isEmpty()))
 		{
+		//get the first open precondition in the queue
+		precondition = this.getOpenPrecondition();
+		System.out.println("The openPrecondition:	"+ precondition);
 
-			//get the first open precondition in the queue
-			precondition = this.getOpenPrecondition();
 
+		//search for an effect in the initial state to satisfy it (if there is)
+		if(binding.isBounded(precondition))
+		{
+			boolean isFoundInIntialState = this.searchEffectInInitialState(precondition);
+			System.out.println("In Initial State?	"+isFoundInIntialState);
 
-
-			//search for an effect in the initial state to satisfy it (if there is)
-			if(binding.isBounded(precondition))
+			if(!(isFoundInIntialState))
 			{
-				boolean isFoundInIntialState = this.searchEffectInInitialState(precondition);
-				//System.out.println(precondition.toString() + "  "+isFoundInIntialState);
-			}
-			
+				this.searchEffectsInActionDomain(precondition);
 
+			}
+		}
+
+		else
+		{
+			//here I have to add a new call for method to search in initial state to match it
+			
 			//search for an action in the action domain to satisfy the open precondition
 			//add the action to the plan
 			this.searchEffectsInActionDomain(precondition);
-			//System.out.println(precondition.toString());
-
-
-//			for(Literal pre :openPreconditions)
-//			{
-//				System.out.println(pre.toString());
-//			}
-//
-//			System.out.println("\n\n");
-
-
-			i++;
 		}
 
+		//			for(Literal pre :openPreconditions)
+		//			{
+		//				System.out.println(pre.toString());
+		//			}
+		//
+					System.out.println("\n\n");
 
-
-
+		}
 	}
 
 
@@ -118,7 +118,7 @@ public class Planner
 
 	}
 
-	
+
 	/**
 	 * This method is to check the initial state if it satisfies the openPrecondition
 	 * Works only with the bounded precondition
@@ -136,7 +136,8 @@ public class Planner
 			{
 				System.out.println("YESSSSSSSSSS");
 				System.out.print(precondition.toString());
-				System.out.println(parser.getIntialStateEffects(i).toString());
+				this.removeOpenPrecondition();
+
 				return true;
 			}
 		}
@@ -163,43 +164,49 @@ public class Planner
 					if(!(parser.getActionsEffects(i, f).isNegative()))
 					{
 						//System.out.println(parser.getActionsEffects(i, f).getLiteralParameters(0));
-						
+
 						//To get the step 
 						step = parser.getAction(i);
 
 						//bind the variables 
 						binding.bindLiterals(step, precondition , f);
-						
+
 						//adding the new step to the array of actions
 						Actions.add(step);
 						id.put(key, step);
 						key++;
-						
+
 						//add causal Link
-						causalLink.addLink(step, precondition, openPreconditionSteps.getFirst());
-						Links.add(causalLink);
-						
+						//causalLink.addLink(step, precondition, openPreconditionSteps.getFirst());
+						//Links.add(causalLink);
+
 						//add ordering
-						ordering.add(step, openPreconditionSteps.getFirst());
+						//ordering.add(step, openPreconditionSteps.getFirst());
 
 
 						//remove the precondition from the queue
 						if(binding.isBounded(precondition))
 						{
 							System.out.println("dequuuuued --->"+precondition.toString());
+							addPreconditions(step);
+
 							this.removeOpenPrecondition();
 
 						}
 						else
 						{
 							//bind the next precondition to get the current precondition dequeued
-							binding.bindNextLiterals(step, precondition);
-							//System.out.println("Not bound"+ precondition.toString());
+							Literal pref = binding.bindNextLiterals(step, precondition);
+
+							Step modifiedStep= binding.bindStepByPreocndition(openPreconditionSteps.getFirst(),precondition);
+							System.out.println("Not bound"+ pref.toString());
+							addPreconditions(step);
+
+							this.removeOpenPrecondition();
 							//System.out.println(step.getPreconditions(0).toString());
 						}
 
 						//adding the new preconditions to the array of openPreconditons 
-						addPreconditions(step);
 					}
 					//System.out.println(parser.getAction(i).getStepName());
 
@@ -246,80 +253,6 @@ public class Planner
 	}
 
 
-
-
-
-
-
-
-
-	/**
-	 * This function is to check the initial state when it satisfies an open precondition
-	 * @param precondition
-	 */
-	public void searchEffectInInitialStateOLD(Literal precondition)
-	{
-		int effSize = parser.getProblemDomainEffectsSize();
-
-
-		for(int i=0; i< effSize;i++)
-		{
-			//check the name of the literal in the initial state (At)
-			if(precondition.getLiteralName().equals(parser.getIntialStateEffects(i).getLiteralName()))
-			{
-				//how many parameter in the found effect
-				int sizeParameters = parser.getIntialStateEffects(i).sizeLiteralParameters();
-				for(int x = 0; x<sizeParameters;x++)
-				{
-					if(binding.isBounded(precondition))		//to check the precondition if it is bounded 
-					{
-						int counter=0;		//(At ?? ??) === (At ?? ??)
-						if(precondition.getLiteralParameters(counter).equals(parser.getIntialStateEffects(i).getLiteralParameters(counter)))
-						{
-							counter++;		//(At C1 ??) === (At C1 ??)
-							if(precondition.getLiteralParameters(counter).equals(parser.getIntialStateEffects(i).getLiteralParameters(counter)))
-							{
-								System.out.println("The Variable is bounded");
-								//System.out.println("found");
-								break;
-								//(At C1 JFK) === (At C1 JFK)
-								//System.out.print(parser.getIntialStateEffects(i).getLiteralName());
-								//System.out.println(parser.getIntialStateEffects(i).getLiteralParameters(x));
-							}
-						}
-					}else						//when the precondition is not bounded
-					{
-						int paraNum =binding.checkParaNotBounded(precondition);
-						int counter = 0;
-
-						if(counter != paraNum)
-						{
-							if(precondition.getLiteralParameters(counter).equals(parser.getIntialStateEffects(i).getLiteralParameters(counter)))
-							{
-								System.out.println("First Paramter is good");
-								break;
-
-							}
-						}
-						else if(counter == paraNum)
-						{
-							counter++;
-							if(precondition.getLiteralParameters(counter).equals(parser.getIntialStateEffects(i).getLiteralParameters(counter)))
-							{
-								System.out.println("The Variable is NOT bounded");
-
-							}
-						}
-
-
-
-					}
-				}
-			}
-		}
-
-		//System.out.println("Nothing found");
-	}
 
 
 
