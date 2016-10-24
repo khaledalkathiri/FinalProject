@@ -5,37 +5,44 @@ public class CausalLink
 {
 	
 	private Step newStep;
-	private Step oldStep;
 
 	private Literal precondition;
 	private boolean excuted;
-	private CausalLink causalLink;
 
 	
 	
 	
-	public CausalLink(Step newStep, Literal precondition, Step oldStep)
+	public CausalLink()
 	{
-		this.newStep = newStep;
-		this.oldStep = oldStep;
-		this.precondition = precondition;
 		this.excuted = false;
 	}
 	
 	
 	
-	public void addLink(Step newStep, Literal precondition, Step oldStep)
+	public void addLink(Step newStep, Literal precondition)
 	{
+		this.newStep = newStep;
+		this.precondition = precondition;
 		precondition.setExcuted(true);
-		//System.out.println("it's excuted");
-			
-			
+
 	}
 
+	public Step getStepName()
+	{
+		return this.newStep;
+	}
 
+	public Literal getPrecondition()
+	{
+		return this.precondition;
+	}
+
+	
+	
 	public String toString()
 	{
-		return oldStep.getStepName()+ " -->" + newStep.getStepName();
+
+		return this.getPrecondition() + " -->" + this.getStepName().getStepName();
 	}
 	
 	

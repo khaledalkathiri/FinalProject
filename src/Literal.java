@@ -29,7 +29,6 @@ public class Literal
 	{
 
 		literal = new Literal(null, null);
-
 		int counter =0;
 		String[] delim;
 		delim = string.split("\\s+");
@@ -178,7 +177,7 @@ public class Literal
 	
 	public boolean isExcuted()
 	{
-		if(this.executed = true)
+		if(this.executed == true)
 			return true;
 		else
 			return false;

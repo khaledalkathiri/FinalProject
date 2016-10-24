@@ -10,11 +10,13 @@ public class Planner
 {
 	HashMap <Integer, Step> id = new HashMap<Integer, Step>();
 
-	LinkedList <Literal> openPreconditions = new LinkedList <Literal>();
-	LinkedList <Step> openPreconditionSteps = new LinkedList <Step>();		//parallel to the openPrecondition
-	ArrayList <Step>  Actions = new ArrayList <Step>();
+	//LinkedList <Literal> openPreconditions = new LinkedList <Literal>();
+	//LinkedList <Step> openPreconditionSteps = new LinkedList <Step>();		//parallel to the openPrecondition
+	LinkedList <Step>  Actions = new LinkedList <Step>();
 	ArrayList <CausalLink>  Links = new ArrayList <CausalLink>();
 
+	
+	LinkedList <OpenPrecondition> openPrecon = new LinkedList <OpenPrecondition>();
 
 
 	private Parser parser;
@@ -24,6 +26,7 @@ public class Planner
 	private CausalLink causalLink;
 	private Ordering ordering;
 	private int key;
+	private OpenPrecondition openPrecondition;
 
 
 	public Planner(Parser p) throws FileNotFoundException
@@ -32,14 +35,16 @@ public class Planner
 		id.put(1, p.getGoalState());
 		this.key=2;
 		this.parser = p;
-		Actions = new ArrayList <Step>();
-		openPreconditions = new LinkedList <Literal>();
-		openPreconditionSteps = new LinkedList <Step>();
+		Actions = new LinkedList <Step>();
+		Links = new ArrayList <CausalLink>();
+
+		
+		openPrecon = new LinkedList <OpenPrecondition>();
 
 		binding = new Binding(p);
-		causalLink= new CausalLink(null,null,null);
 		ordering = new Ordering();
 		ordering.add(p.getInitialState(), p.getGoalState());
+		openPrecondition= new OpenPrecondition(null,null);
 
 	}
 
@@ -50,51 +55,72 @@ public class Planner
 	{
 		//using the bag method to shuffle all the actions in the Domain
 		//parser.randomizeActions();
-
-
-		Literal precondition;
+		
+		
+		OpenPrecondition precondition;
 
 		//adding the goal preconditions to the queue
 		step = parser.getGoalState();
 		this.addGoalOpenPrecondition();
 
 
-		while(!(openPreconditions.isEmpty()))
+		//while(!(openPreconditions.isEmpty()))
+		while(!(openPrecon.isEmpty()))
 		{
-		//get the first open precondition in the queue
-		precondition = this.getOpenPrecondition();
-		System.out.println("The openPrecondition:	"+ precondition);
+			//get the first open precondition in the queue
+			precondition = this.getOpenPrecondition();
+			System.out.println("The openPrecondition:	"+ precondition.getOpenPrecondtion());
 
 
-		//search for an effect in the initial state to satisfy it (if there is)
-		if(binding.isBounded(precondition))
-		{
-			boolean isFoundInIntialState = this.searchEffectInInitialState(precondition);
-			System.out.println("In Initial State?	"+isFoundInIntialState);
-
-			if(!(isFoundInIntialState))
+			//search for an effect in the initial state to satisfy it (if there is)
+			if(binding.isBounded(precondition.getOpenPrecondtion()))
 			{
-				this.searchEffectsInActionDomain(precondition);
+				boolean isFoundInIntialState = this.searchEffectInInitialState(precondition);
+				System.out.println("In Initial State?	"+isFoundInIntialState);
+
+				if(!(isFoundInIntialState))
+				{
+					this.searchEffectsInActionDomain(precondition);
+
+				}
+			}
+
+			else
+			{
+				boolean isFoundSimilarInInitialStat = this.searchSimilarInInitialState(precondition);
+				System.out.println("Simailr In Initial State?	"+isFoundSimilarInInitialStat);
+				if((isFoundSimilarInInitialStat))
+				{
+					System.out.println("Found simialr");
+					System.out.println(precondition.getOpenPrecondtion());
+
+					this.removeOpenPrecondition();
+
+				}
+				
+				else
+				{
+					//search for an action in the action domain to satisfy the open precondition
+					//add the action to the plan
+					this.searchEffectsInActionDomain(precondition);
+
+				}
 
 			}
-		}
 
-		else
+			//			for(Literal pre :openPreconditions)
+			//			{
+			//				System.out.println(pre.toString());
+			//			}
+			//
+			System.out.println("\n\n");
+
+		}
+		
+		
+		for(CausalLink pre :Links)
 		{
-			//here I have to add a new call for method to search in initial state to match it
-			
-			//search for an action in the action domain to satisfy the open precondition
-			//add the action to the plan
-			this.searchEffectsInActionDomain(precondition);
-		}
-
-		//			for(Literal pre :openPreconditions)
-		//			{
-		//				System.out.println(pre.toString());
-		//			}
-		//
-					System.out.println("\n\n");
-
+			System.out.println(pre.getPrecondition().isExcuted()+ "--->"+pre.toString());
 		}
 	}
 
@@ -109,8 +135,15 @@ public class Planner
 		//to get how many preconditions in the goal state
 		for(int i = 0; i < parser.getProblemDomainPreconditionSize(); i++)
 		{
-			openPreconditions.addLast(parser.getGoalPreconditions(i));
-			openPreconditionSteps.addLast(parser.getGoalState());
+			//openPreconditions.addLast(parser.getGoalPreconditions(i));
+			//openPreconditionSteps.addLast(parser.getGoalState());
+			
+			OpenPrecondition object = new OpenPrecondition(null,null);
+
+			object.addOpenPrcondition(parser.getGoalPreconditions(i));
+			object.addStep(parser.getGoalState());
+			openPrecon.add(object);
+			
 			//System.out.println(openPreconditionSteps.get(0).getPreconditions(i).toString());
 			//System.out.println(openPreconditionSteps.size() + "		"+openPreconditions.size());
 
@@ -126,8 +159,11 @@ public class Planner
 	 * @return true if the precondition is found
 	 * @return false if the precondition is not found
 	 */
-	public boolean searchEffectInInitialState(Literal precondition)
+	public boolean searchEffectInInitialState(OpenPrecondition openPrecondition)
 	{
+		causalLink= new CausalLink();
+
+		Literal precondition= openPrecondition.getOpenPrecondtion();
 		int effSize = parser.getProblemDomainEffectsSize();
 		for(int i=0; i< effSize;i++)
 		{
@@ -136,6 +172,10 @@ public class Planner
 			{
 				System.out.println("YESSSSSSSSSS");
 				System.out.print(precondition.toString());
+				
+				causalLink.addLink(parser.getInitialState(), precondition);
+				Links.add(causalLink);
+
 				this.removeOpenPrecondition();
 
 				return true;
@@ -148,9 +188,11 @@ public class Planner
 	 * This function searches for an effect in ActionDomain to solve an open precondition
 	 * @param precondition
 	 */
-	public void searchEffectsInActionDomain(Literal precondition)
+	public boolean searchEffectsInActionDomain(OpenPrecondition openPrecondition)
 	{
-		causalLink= new CausalLink(null,null,null);
+		Literal precondition= openPrecondition.getOpenPrecondtion();
+		causalLink= new CausalLink();
+
 		int stepsNum = parser.getActionDomainSize();		//how many action in the domain
 		for(int i=0; i< stepsNum;i++)
 		{
@@ -171,14 +213,9 @@ public class Planner
 						//bind the variables 
 						binding.bindLiterals(step, precondition , f);
 
-						//adding the new step to the array of actions
-						Actions.add(step);
-						id.put(key, step);
-						key++;
 
-						//add causal Link
-						//causalLink.addLink(step, precondition, openPreconditionSteps.getFirst());
-						//Links.add(causalLink);
+
+
 
 						//add ordering
 						//ordering.add(step, openPreconditionSteps.getFirst());
@@ -189,7 +226,18 @@ public class Planner
 						{
 							System.out.println("dequuuuued --->"+precondition.toString());
 							addPreconditions(step);
+							
+							//Links.add(causalLink.addLink(openPrecondition.getStep(), precondition));
 
+							//adding the new step to the array of actions
+							Actions.addLast(step);
+							id.put(key, step);
+							key++;
+							
+							//add causal Link
+							causalLink.addLink(step, precondition);
+							Links.add(causalLink);
+							
 							this.removeOpenPrecondition();
 
 						}
@@ -197,25 +245,90 @@ public class Planner
 						{
 							//bind the next precondition to get the current precondition dequeued
 							Literal pref = binding.bindNextLiterals(step, precondition);
-
-							Step modifiedStep= binding.bindStepByPreocndition(openPreconditionSteps.getFirst(),precondition);
+							
+							//to bind the whole step with the new bounded precondition In C1 P1
+							binding.bindStepByPreocndition(openPrecondition.getStep(),precondition);
 							System.out.println("Not bound"+ pref.toString());
 							addPreconditions(step);
 
+							//Links.add(causalLink.addLink(openPrecondition.getStep(), precondition));
+
+							//adding the new step to the array of actions
+							Actions.addLast(step);
+							id.put(key, step);
+							key++;
+							
+							//add causal Link
+							causalLink.addLink(step, precondition);
+							Links.add(causalLink);
+							
 							this.removeOpenPrecondition();
-							//System.out.println(step.getPreconditions(0).toString());
 						}
+						return true;
 
-						//adding the new preconditions to the array of openPreconditons 
 					}
-					//System.out.println(parser.getAction(i).getStepName());
-
 				}
 			}
 		}
+		return false;
 	}
 
 
+	/**
+	 * This methods searches for a literal in the intial state that is similar to it but not fully bounded.
+	 * @param precondition
+	 * @return
+	 */
+	public boolean searchSimilarInInitialState(OpenPrecondition openPrecondition)
+	{
+		Literal precondition= openPrecondition.getOpenPrecondtion();
+		causalLink= new CausalLink();
+
+		//Literal newPrecondition = precondition;
+
+		
+		ArrayList <Literal> arry = new ArrayList <Literal>();
+		int sizeEffectInitailState = parser.getProblemDomainEffectsSize();	
+
+		arry.clear();
+
+		int index=0;
+		for(int y =0; y< sizeEffectInitailState;y++)		//The size of effect in initial state
+		{
+
+			//CargoAt == CargoAt
+			if(precondition.getLiteralName().equals(parser.getIntialStateEffects(y).getLiteralName()))		
+			{
+				arry.add(index,parser.getIntialStateEffects(y));
+				index++;
+
+			}
+		}
+
+
+		//loop through the array to check if there is a match in the initial State
+		for(int f=0; f< arry.size();f++)
+		{
+			int paraBounded = binding.checkParaBounded(precondition);
+
+			Literal temp = arry.get(f);	//CargoAt C1 SFO & CargoAt C2 JFK
+			if(precondition.getLiteralParameters(paraBounded).equals(temp.getLiteralParameters(paraBounded)))
+			{
+
+				int paraNotBounded = binding.checkParaNotBounded(precondition);
+				String groundLetter = precondition.getLiteralParameters(paraNotBounded);
+				String newVariable = temp.getLiteralParameters(paraNotBounded);
+
+				binding.bindPrecondtion(precondition, groundLetter, newVariable);
+				binding.bindStep(openPrecondition.getStep(), groundLetter, newVariable);
+				
+				causalLink.addLink(parser.getInitialState(), precondition);
+				Links.add(causalLink);
+				return true;
+			}
+		}
+		return false;
+	}
 
 
 	/**
@@ -228,8 +341,18 @@ public class Planner
 		int preconditionsNum = step.getPreconditionSize();
 		for(int i=0; i<preconditionsNum;i++)
 		{
-			openPreconditions.addLast(step.getPreconditions(i));
-			openPreconditionSteps.addLast(step);
+			//openPreconditions.addLast(step.getPreconditions(i));
+			//openPreconditionSteps.addLast(step);
+			
+			openPrecondition.addStep(step);
+			
+			OpenPrecondition object = new OpenPrecondition(null,null);
+
+			object.addOpenPrcondition(step.getPreconditions(i));
+			object.addStep(step);
+			
+			openPrecon.addLast(object);
+			
 			//System.out.print(step.getPreconditions(i).getLiteralName());
 			//System.out.println(step.getPreconditions(i).getLiteralParameters(0));
 			//System.out.println(openPreconditionSteps.size() + "		"+openPreconditions.size());
@@ -241,15 +364,15 @@ public class Planner
 
 
 
-	public Literal getOpenPrecondition()
+	public OpenPrecondition getOpenPrecondition()
 	{
-		return openPreconditions.getFirst();
+		return openPrecon.getFirst();
 	}
 
-	public Literal removeOpenPrecondition()
+	public OpenPrecondition removeOpenPrecondition()
 	{
-		openPreconditionSteps.removeFirst();
-		return openPreconditions.removeFirst();
+		
+		return openPrecon.removeFirst();
 	}
 
 

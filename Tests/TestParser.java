@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.junit.Test;
 
@@ -63,10 +64,7 @@ public class TestParser
 		assertFalse(p.ActionsDomain.get(2).getEffects(0).isNegative());					//is the effect negative
 		assertTrue(p.ActionsDomain.get(2).getEffects(1).isNegative());					//is the effect negative
 
-		
-
-
-		
+	
 	}
 	
 	@Test
@@ -95,7 +93,7 @@ public class TestParser
 		//Goal State
 		assertEquals("goal",p.ProblemDomain.get(1).getStepName());
 		assertEquals("CargoAt C1 JFK",p.ProblemDomain.get(1).getPreconditions(0).toString());
-		assertEquals("CargoAt C2 SFO",p.ProblemDomain.get(1).getPreconditions(1).toString());
+		//assertEquals("CargoAt C2 SFO",p.ProblemDomain.get(1).getPreconditions(1).toString());
 
 
 	}
@@ -149,6 +147,44 @@ public class TestParser
 	
 	
 	@Test
+	public void testCausalLink() throws FileNotFoundException
+	{
+		Parser parser = new Parser();
+		String domainName = "Domain.txt";
+		String problemName = "Problem.txt";
+		parser.parseDomain(domainName);
+		parser.parseProblem(problemName);
+		
+		Planner planner = new Planner(parser);
+		Binding binding = new Binding(parser);
+		CausalLink link = new CausalLink();//null, null);
+		
+		Literal precondition = parser.getGoalPreconditions(0);
+		assertEquals("CargoAt C1 JFK", precondition.toString());
+		assertEquals(false,precondition.isExcuted());
+
+				
+		Step unload = parser.ActionsDomain.get(1);
+		assertEquals(" UNLOAD",unload.getStepName());
+		assertEquals("In ?c ?p", unload.getPreconditions(0).toString());
+		assertEquals("PlaneAt ?p ?a",unload.getPreconditions(1).toString());
+		assertEquals("Cargo ?c", unload.getPreconditions(2).toString());
+		assertEquals("Plane ?p", unload.getPreconditions(3).toString());
+		assertEquals("Airport ?a", unload.getPreconditions(4).toString());
+		assertEquals("CargoAt ?c ?a", unload.getEffects(0).toString());
+		assertEquals("In ?c ?p", unload.getEffects(1).toString());
+		
+
+		
+		
+		link.addLink(unload, precondition);	
+		assertEquals(true,precondition.isExcuted());
+		
+		assertEquals("CargoAt C1 JFK --> UNLOAD", link.toString());
+
+	}
+	
+	@Test
 	public void testAddingPreconditions() throws FileNotFoundException
 	{
     	String domainName = "Domain.txt";
@@ -168,7 +204,20 @@ public class TestParser
 
 
 		planner.search();
-		//assertEquals("At C1 JFK",planner.removeOpenPrecondition());
+		assertEquals(" UNLOAD",planner.Actions.get(0).getStepName());
+		assertEquals(" LOAD",planner.Actions.get(1).getStepName());
+		assertEquals(" FLY",planner.Actions.get(2).getStepName());
+		
+		assertEquals("In C1 P1", planner.Actions.get(0).getPreconditions(0).toString());
+		assertEquals("PlaneAt P1 JFK", planner.Actions.get(0).getPreconditions(1).toString());
+		
+		assertEquals("CargoAt C1 SFO", planner.Actions.get(1).getPreconditions(0).toString());
+		assertEquals("PlaneAt P1 SFO", planner.Actions.get(1).getPreconditions(1).toString());
+
+		assertEquals("PlaneAt P1 SFO", planner.Actions.get(2).getPreconditions(0).toString());
+		assertEquals("Airport SFO", planner.Actions.get(2).getPreconditions(2).toString());
+
+		
 		//assertEquals("At C2 SFO",planner.removeOpenPrecondition());
 
 		//assertEquals(planner.id.get(0).)
@@ -237,10 +286,13 @@ public class TestParser
 		
 		Planner planner = new Planner(parser);
 		Binding binding = new Binding(parser);
+		OpenPrecondition openprecon = new OpenPrecondition(null, null);
+		openprecon.addOpenPrcondition(parser.getGoalPreconditions(0));
+		openprecon.addStep(parser.getGoalState());
 		
 		assertEquals("Cargo C1", parser.getIntialStateEffects(0).toString());
 		assertEquals("CargoAt C1 JFK", parser.getGoalPreconditions(0).toString());
-		assertFalse(planner.searchEffectInInitialState(parser.getGoalPreconditions(0)));
+		assertFalse(planner.searchEffectInInitialState(openprecon));
 		Literal openPrecondition = parser.getGoalPreconditions(0);
 				
 				
@@ -309,6 +361,42 @@ public class TestParser
 		assertEquals(true, binding.isBounded(openPrecondition));
 		binding.bindLiterals(load, openPrecondition, 0);
 
+	}
+	
+	
+	@Test
+	public void testBindingSimilar() throws FileNotFoundException
+	{
+		Parser parser = new Parser();
+		
+		String domainName = "Domain.txt";
+		String problemName = "Problem.txt";
+		parser.parseDomain(domainName);
+		parser.parseProblem(problemName);
+		
+		Planner planner = new Planner(parser);
+		Binding binding = new Binding(parser);
+		OpenPrecondition openprecon = new OpenPrecondition(null, null);
+		openprecon.addOpenPrcondition(parser.getGoalPreconditions(0));
+		openprecon.addStep(parser.getGoalState());
+		
+		Step unload = parser.ActionsDomain.get(1);
+		assertEquals("CargoAt C1 JFK", openprecon.getOpenPrecondtion().toString());
+		openprecon.getOpenPrecondtion().setLiteralParameters(1, "?a");
+		assertEquals("CargoAt C1 ?a", openprecon.getOpenPrecondtion().toString());
+
+		//The problem here is that Actions LinkedList is empty
+		planner.searchSimilarInInitialState(openprecon);
+		assertEquals("CargoAt C1 SFO", openprecon.getOpenPrecondtion().toString());
+
+		//it is really hard to test it because Action LinkedList is empty
+//		assertEquals("In C1 ?p", unload.getPreconditions(0).toString());
+//		assertEquals("PlaneAt ?p SFO", unload.getPreconditions(1).toString());
+//		assertEquals("Cargo C1", unload.getPreconditions(2).toString());
+//		assertEquals("Plane ?p", unload.getPreconditions(3).toString());
+//		assertEquals("Airport SFO",unload.getPreconditions(4).toString());
+//		assertEquals("CargoAt C1 SFO",unload.getEffects(0).toString());
+//		assertEquals("In C1 ?p",unload.getEffects(1).toString());
 	}
 	
 	
@@ -405,17 +493,10 @@ public class TestParser
 		literal.addLiteralParameters("C1");
 		literal.addLiteralParameters("SFO");
 		
-		planner.searchEffectInInitialState(literal);
-		literal.setLiteralParameters(1, "?q");
-		planner.searchEffectInInitialState(literal);
 		literal.setLiteralParameters(0, "?p");
-		planner.searchEffectInInitialState(literal);
-
-		Literal literal1 = new Literal(null, null);
-		literal1.addLiteralName("At");
-		literal1.addLiteralParameters("C1");
-		//planner.searchEffectInInitialState(literal1);
-
+		literal.setLiteralParameters(1, "?a");
+		assertEquals("At ?p ?a", literal.toString());
+		
 
 
 	}

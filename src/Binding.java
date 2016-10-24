@@ -105,7 +105,7 @@ public class Binding
 	 * @param newVariable
 	 * @return
 	 */
-	private Literal bindPrecondtion(Literal precondition, String groundLetter, String newVariable) 
+	public  Literal bindPrecondtion(Literal precondition, String groundLetter, String newVariable) 
 	{
 		int precondtionParaSize = precondition.sizeLiteralParameters();
 		for(int i=0;i<precondtionParaSize;i++)
@@ -152,7 +152,8 @@ public class Binding
 	
 
 	/**
-	 * 
+	 * This method is to bind next literals to allow the openPrecondition to be dequeued 
+	 * becuase it can't be dequeued unless it is fully bounded
 	 * @param variable
 	 * @param precondition
 	 * @return
