@@ -44,6 +44,11 @@ public class Order
 		return ordering.get(index);
 	}
 	
+	public ArrayList<Step> getArray()
+	{
+		return this.ordering;
+	}
+	
 	public int sizeSteps()
 	{
 		return ordering.size();
