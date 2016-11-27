@@ -4,12 +4,12 @@
   (:predicates (Have ?x) (At ?x) (Sells ?store ?x))
   
   (:action BUY
-     :parameters (?x ?store)
-     :precondition (and (At ?store) (Sells ?store ?x))
-     :effect (and (Have(x))))
+     :parameters( ?x ?store )
+     :precondition (and (Sells ?store ?x) (At ?store))
+     :effect (and (Have ?x))))
      
   (:action Go
-     :parameters (?x ?y)
-     :precondition (and (At ?x)) 
-     :effect (and (At(y)) (not(At(x))))
+     :parameters ( ?from ?to )
+     :precondition (and (At ?from)) 
+     :effect (and (At ?to)) (not At ?from))))
   

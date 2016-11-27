@@ -1,0 +1,24 @@
+(define (domain putting-pair-of-shoes)
+  (:predicates (RightShoeOn ?x) (RightSockOn ?x) (LeftShoeOn ?x) (LeftSockOn ?x) )
+  
+  (:action RightShoeOn
+     :parameters ( ?x )
+     :precondition (and (RightSockOn ?x))
+     :effect (and (RightShoeOn ?x)))
+  
+  (:action RightSockOn
+     :parameters ( ?x )
+     :precondition (and)
+     :effect (and (RightSockOn ?x)))
+  
+   (:action LeftShoeOn
+     :parameters ( ?x )
+     :precondition (and (LeftSockOn ?x))
+     :effect (and (LeftShoeOn ?x)))
+     
+   (:action LeftSockOn
+     :parameters ( ?x )
+     :precondition (and)
+     :effect (and (LeftSockOn ?x)))
+   )
+     

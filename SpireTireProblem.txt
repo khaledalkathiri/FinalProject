@@ -1,0 +1,7 @@
+
+(define (problem pb1)
+  (:domain SpireTire)
+          
+  (:init (FlatAt LeftTire LeftAxle) (SpareAt Spare Trunk) (FlatAt Ground)
+  
+  (:goal (and (PutOn Spare LeftAxle))

@@ -1,0 +1,18 @@
+(define (domain SpireTire)
+  (:predicates (SpareAt ?s ?from) (FlatAt ?f ?from) (Clear ?a)	(PutOn ?s ?a) (FlatAt ?g))
+
+  (:action RemoveSpare
+     :parameters ( ?s ?from )
+     :precondition (and (SpareAt ?s ?from))
+     :effect (and (SpareOnGround ?s ) (not SpareAt ?s ?from))))
+  
+  (:action RemoveFlat
+     :parameters ( ?f ?from )
+     :precondition (and (FlatAt ?f ?from))
+     :effect (and (Clear ?from)))
+  
+  (:action PutOn
+     :parameters ( ?s ?a )
+     :precondition (and (SpareOnGround ?s) (Clear ?a)
+     :effect (and (PutOn ?s ?a) (not SpareOnGround ?s ))))
+  )

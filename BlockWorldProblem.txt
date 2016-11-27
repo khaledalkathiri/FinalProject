@@ -1,0 +1,7 @@
+(define (problem blocksworld-prob1)
+  (:domain blocksworld)
+
+
+  (:init (on-table a) (on-table b) (clear a) (clear b) (on-table c) (clear c))
+  
+  (:goal (and (on a b) (on c b))))
