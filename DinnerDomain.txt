@@ -1,0 +1,28 @@
+(define (domain birthday-dinner)
+
+  (:predicates (clean ?x) (dinner ?x) (Have ?g) (HasGift ?g) (ClearGarbage ?x) (Surprise ?n ?g )
+ 
+ (:action cook
+    :parameters ( ?x )
+    :precondition (and (clean ?x))
+    :effect (and (dinner ?x)))
+    
+    
+ (:action wrap
+    :parameters ( ?g )
+    :precondition (and (Have ?g))
+    :effect (and (HasGift ?g) (not Have ?g))
+    
+    
+ (:action carry
+    :parameters ( ?x )
+    :precondition (and (garbage ?x))
+    :effect (and (ClearGarbage ?x) (not clean ?x)))
+    
+ (:action giveGift
+    :parameters ( ?n ?g )
+    :precondition (and (HasGift ?g))
+    :effect (and (Surprise ?n ?g ) (not HasGift ?g)))
+    
+  
+)

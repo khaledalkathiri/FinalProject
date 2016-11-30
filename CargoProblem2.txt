@@ -1,0 +1,9 @@
+
+(define (problem)
+  (:domain air-cargo)
+  
+        
+  (:init (Cargo C1) (Cargo C2) (Plane P1) (Plane P2) (Airport SFO) (Airport JFK) (CargoAt C1 SFO) (CargoAt C2 JFK) (PlaneAt P1 SFO) (PlaneAt P2 JFK))
+
+  (:goal (and (CargoAt C1 JFK)
+ 

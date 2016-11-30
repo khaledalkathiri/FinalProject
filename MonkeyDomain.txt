@@ -1,0 +1,34 @@
+(define (domain monkey-domain)
+  (:constants monkey box knife bananas glass water waterfountain)
+  
+  (:predicates (on-floor ?m) (MonkeyAt ?x ) (BananaAt ?y ) (KnifeAt ?y ) (BoxAt ?x) (Monkey ?m) (onbox ?x)  (location ?x)(HasBanana ?m ) (HasKnife ?m))
+	       
+	       
+  (:action go-to
+	   :parameters ( ?y ?x )
+	   :precondition (and  (MonkeyAt ?y))
+	   :effect (and (MonkeyAt ?x) (not MonkeyAt ?y))))
+	   
+  (:action climb
+	   :parameters ( ?x )
+	   :precondition (and (BoxAt ?x) (MonkeyAt ?x))
+	   :effect (and (onbox ?x) )))
+	   
+  (:action push-box
+	   :parameters ( ?y ?x  )
+	   :precondition (and (BoxAt ?y) (MonkeyAt ?y) 
+	   :effect (and (MonkeyAt ?x) (not MonkeyAt ?y)) (BoxAt ?x) (not BoxAt ?y))))
+	   
+  (:action get-knife
+	   :parameters ( ?y )
+	   :precondition (and (KnifeAt  ?y) (MonkeyAt ?y))
+	   :effect (and (HasKnife ?m) (not KnifeAt ?y))))
+	   
+  (:action grab-bananas
+	   :parameters ( ?m ?y )
+	   :precondition (and (BananaAt ?y) (onbox ?y) (Monkey ?m)
+	   :effect (and (HasBanana ?m ))
+	   
+
+	   
+	   

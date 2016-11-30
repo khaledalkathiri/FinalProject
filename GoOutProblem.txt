@@ -1,0 +1,8 @@
+
+(define (problem)
+  (:domain putting-pair-of-shoes)
+          
+  (:init (Clothes Jacket) (Clear LF) (Clear RF)
+  (:goal (and (WearShoes RF LF) (WearClothes Jacket) 
+  
+  

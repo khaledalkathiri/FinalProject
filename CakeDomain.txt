@@ -1,0 +1,25 @@
+(define (domain have-cake-and-eat-it-too)
+ (:requirements :strips)
+ (:predicates (have ?cake) (HaveIngredients ?x) (Ingredients ?x) (eaten ?cake) (Sells ?store ?x) (At ?store )
+ 
+
+ (:action Eat
+     :parameters ( ?cake )
+     :precondition (and (have ?cake))
+     :effect (and (eaten ?cake) (not have ?cake)))
+     
+ (:action Bake
+      :parameters ( ?cake ?x ?y )
+     :precondition (and (HaveIngredients ?x ) (Ingredients ?x) (At ?y)
+     :effect (and (have ?cake))
+     
+ (:action BuyIngredients
+      :parameters ( ?x ?store  )
+     :precondition (and (Sells ?store ?x) (At ?store ) (Ingredients ?x)
+     :effect (and (HaveIngredients ?x))))
+     
+ (:action Go
+      :parameters ( ?from ?to  )
+     :precondition (and (At ?from )
+     :effect (and (At ?to) (not At ?from)))
+     

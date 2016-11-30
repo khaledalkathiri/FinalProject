@@ -1,0 +1,8 @@
+
+(define (problem pb1)
+  (:domain ShoopingDomain)
+  
+        
+  (:init (At Home) (Sells SM Milk) (Sells SM Banana) (Sells SM Water) (Sells HW Drill) (Sells HW Nail))
+
+  (:goal (and (Have Milk) (Have Banana) (Have Drill) (Have Nail) 

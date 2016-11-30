@@ -1,0 +1,6 @@
+(define (problem birthday-dinner)
+  (:domain birthday-dinner)
+  
+  (:init  (garbage garbage) (clean chicken) (Have doll) (Have car))
+  
+  (:goal (and (dinner chicken) (Surprise John doll) (Surprise John car) (ClearGarbage garbage)))

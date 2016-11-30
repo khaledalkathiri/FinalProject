@@ -16,7 +16,7 @@ public class TestParser
 	@Test
 	public void testParsingActionDomain() throws FileNotFoundException
 	{
-    	String domainName = "Domain.txt";
+    	String domainName = "CargoDomain.txt";
 
 		Parser p = new Parser();
 		p.parseDomain(domainName);
@@ -71,7 +71,7 @@ public class TestParser
 	@Test
 	public void testParsingProblemDomain() throws FileNotFoundException
 	{
-    	String ProblemName = "Problem.txt";
+    	String ProblemName = "CargoProblem.txt";
 
     	
 
@@ -106,7 +106,7 @@ public class TestParser
 	@Test 
 	public void testParsingPredicates() throws FileNotFoundException
 	{
-		String domainName = "Domain.txt";
+		String domainName = "CargoDomain.txt";
 
 		Parser p = new Parser();
 		p.parseDomain(domainName);
@@ -128,7 +128,7 @@ public class TestParser
 		assertEquals(2,p.countParaInPredicate(literal));
 		
 		//parameters
-		assertEquals("(?c", p.ActionsDomain.get(0).getParameter(0));
+		assertEquals("?c", p.ActionsDomain.get(0).getParameter(0));
 		assertEquals(" LOAD[?c, ?p, ?a]", p.ActionsDomain.get(0).toString());
 
 
@@ -140,7 +140,7 @@ public class TestParser
 	@Test
 	public void testSettingLiteralPara() throws FileNotFoundException
 	{
-    	String domainName = "Domain.txt";
+    	String domainName = "CargoDomain.txt";
 
 		Parser p = new Parser();
 		p.parseDomain(domainName);
@@ -160,8 +160,8 @@ public class TestParser
 	public void testGettingOpenPrecondition() throws FileNotFoundException, CloneNotSupportedException
 	{
 		Parser parser = new Parser();
-		String domainName = "Domain.txt";
-		String problemName = "Problem.txt";
+		String domainName = "CargoDomain.txt";
+		String problemName = "CargoProblem.txt";
 		parser.parseDomain(domainName);
 		parser.parseProblem(problemName);
 		
@@ -179,6 +179,9 @@ public class TestParser
 		precon = new OpenPrecondition(0,secondprecon);
 		planner.searchEffectsInActionDomain(precon);
 		
+		assertEquals("CargoAt C1 JFK",planner.getOpenPrecondition().getOpenPrecondtion().toString());
+		assertEquals("CargoAt C2 SFO",planner.getOpenPrecondition().getOpenPrecondtion().toString());
+
 		
 		assertEquals("In C1 ?p",planner.getOpenPrecondition().getOpenPrecondtion().toString());
 		assertEquals("PlaneAt ?p JFK",planner.getOpenPrecondition().getOpenPrecondtion().toString());
@@ -205,8 +208,8 @@ public class TestParser
 	public void testCausalLink() throws FileNotFoundException
 	{
 		Parser parser = new Parser();
-		String domainName = "Domain.txt";
-		String problemName = "Problem.txt";
+		String domainName = "CargoDomain.txt";
+		String problemName = "CargoProblem.txt";
 		
 //		String domainName = "ShoppingDomain.txt";
 //		String problemName = "ShoopingProblem.txt";
@@ -256,73 +259,12 @@ public class TestParser
 
 	}
 	
-	@Test
-	public void testOrdering() throws FileNotFoundException
-	{
-		Parser parser = new Parser();
-		String domainName = "Domain.txt";
-		String problemName = "Problem.txt";
-		parser.parseDomain(domainName);
-		parser.parseProblem(problemName);
-		
-		Planner planner = new Planner(parser);
-		Binding binding = new Binding(parser);
-		
-		Order ordering = new Order(null, null);
-		Step unload = parser.ActionsDomain.get(1);
-		Step load = parser.ActionsDomain.get(0);
-
-		Step goal = parser.getGoalState();
-
-		ordering.addStep(goal);
-		ordering.addOrder(unload);
-		ordering.addOrder(load);
-		assertEquals("goal--> UNLOAD   LOAD  ", ordering.toString());
-		
-		OpenPrecondition temp = new OpenPrecondition(null,null);
-		Literal openPrecondition = parser.getGoalPreconditions(0);
-		temp.addOpenPrcondition(openPrecondition);
-		temp.addStep(goal);
-		
-		
-		planner.searchEffectsInActionDomain(temp);
-		assertEquals("CargoAt C1 JFK", temp.getOpenPrecondtion().toString());
-		
-		assertEquals("goal", planner.order.get(0).getStep().getStepName());
-		assertEquals(" UNLOAD", planner.order.get(0).getStepInArray(0).getStepName());
-		
-		temp= new  OpenPrecondition(null,null);
-		Literal nextPrecondition = parser.getAction(1).preconditionArray.get(0);
-		temp.addOpenPrcondition(nextPrecondition);
-		temp.addStep(unload);
-		//to make sure we have the right precondtion
-		assertEquals("In C1 ?p", temp.getOpenPrecondtion().toString());
-
-		
-		planner.searchEffectsInActionDomain(temp);
-		assertEquals(" UNLOAD", planner.order.get(1).getStep().getStepName());
-		assertEquals(" LOAD", planner.order.get(1).getStepInArray(0).getStepName());
-
-		
-		temp= new  OpenPrecondition(null,null);
-		Literal nextPrecondition2 = parser.getAction(1).preconditionArray.get(1);
-		temp.addOpenPrcondition(nextPrecondition2);
-		temp.addStep(unload);
-		assertEquals("PlaneAt P1 JFK", temp.getOpenPrecondtion().toString());
-
-		planner.searchEffectsInActionDomain(temp);
-		assertEquals(" FLY", planner.order.get(1).getStepInArray(1).getStepName());
-
-		
-
-
-	}
 	
 	@Test
 	public void testAddingPreconditions() throws FileNotFoundException
 	{
-    	String domainName = "Domain.txt";
-		String problemName = "Problem.txt";
+    	String domainName = "CargoDomain.txt";
+		String problemName = "CargoProblem.txt";
 		
 		
 		
@@ -342,8 +284,8 @@ public class TestParser
 		planner.search();
 		assertEquals("goal",planner.Actions.get(0).getStepName());
 		assertEquals(" UNLOAD",planner.Actions.get(1).getStepName());
-		assertEquals(" FLY",planner.Actions.get(2).getStepName());
-		assertEquals(" LOAD",planner.Actions.get(3).getStepName());
+		assertEquals(" LOAD",planner.Actions.get(2).getStepName());
+		assertEquals(" FLY",planner.Actions.get(3).getStepName());
 //		
 //		assertEquals("In C1 P1", planner.Actions.get(0).getPreconditions(0).toString());
 //		assertEquals("PlaneAt P1 JFK", planner.Actions.get(0).getPreconditions(1).toString());
@@ -367,8 +309,8 @@ public class TestParser
 	public void bindStepByPrecondition()throws FileNotFoundException
 	{
 		Parser parser = new Parser();
-		String domainName = "Domain.txt";
-		String problemName = "Problem.txt";
+		String domainName = "CargoDomain.txt";
+		String problemName = "CargoProblem.txt";
 		parser.parseDomain(domainName);
 		parser.parseProblem(problemName);
 		
@@ -416,20 +358,18 @@ public class TestParser
 	public void bindNextVariable()throws FileNotFoundException
 	{
 		Parser parser = new Parser();
-		String domainName = "Domain.txt";
-		String problemName = "Problem.txt";
+		String domainName = "CargoDomain.txt";
+		String problemName = "CargoProblem.txt";
 		parser.parseDomain(domainName);
 		parser.parseProblem(problemName);
 		
 		Planner planner = new Planner(parser);
 		Binding binding = new Binding(parser);
-		OpenPrecondition openprecon = new OpenPrecondition(null, null);
+		OpenPrecondition openprecon = new OpenPrecondition(0, null);
 		openprecon.addOpenPrcondition(parser.getGoalPreconditions(0));
-		openprecon.addStep(parser.getGoalState());
-		
+		openprecon.addStep(parser.getGoalState().getStepId());
 		assertEquals("Cargo C1", parser.getIntialStateEffects(0).toString());
 		assertEquals("CargoAt C1 JFK", parser.getGoalPreconditions(0).toString());
-		assertFalse(planner.searchEffectInInitialState(openprecon));
 		Literal openPrecondition = parser.getGoalPreconditions(0);
 				
 				
@@ -483,8 +423,10 @@ public class TestParser
 		assertEquals("CargoAt C1 ?a", load.getEffects(1).toString());
 		
 		assertEquals(false, binding.isBounded(openPrecondition));
-		binding.bindNextLiterals(load, openPrecondition);
 		
+		binding.bindStep(load, "?a", "SFO");
+		binding.bindStep(load, "?p", "P1");
+
 		assertEquals(" LOAD",load.getStepName());
 		assertEquals("CargoAt C1 SFO", load.getPreconditions(0).toString());
 		assertEquals("PlaneAt P1 SFO", load.getPreconditions(1).toString());
@@ -494,6 +436,8 @@ public class TestParser
 		assertEquals("In C1 P1", load.getEffects(0).toString());
 		assertEquals("CargoAt C1 SFO", load.getEffects(1).toString());
 		
+		
+		binding.bindPrecondtion(openPrecondition, "?p", "P1");
 		assertEquals("In C1 P1", openPrecondition.toString());
 		assertEquals(true, binding.isBounded(openPrecondition));
 		binding.bindLiterals(load, openPrecondition, 0);
@@ -501,40 +445,6 @@ public class TestParser
 	}
 	
 	
-	@Test
-	public void testBindingSimilar() throws FileNotFoundException
-	{
-		Parser parser = new Parser();
-		
-		String domainName = "Domain.txt";
-		String problemName = "Problem.txt";
-		parser.parseDomain(domainName);
-		parser.parseProblem(problemName);
-		
-		Planner planner = new Planner(parser);
-		Binding binding = new Binding(parser);
-		OpenPrecondition openprecon = new OpenPrecondition(null, null);
-		openprecon.addOpenPrcondition(parser.getGoalPreconditions(0));
-		openprecon.addStep(parser.getGoalState());
-		
-		Step unload = parser.ActionsDomain.get(1);
-		assertEquals("CargoAt C1 JFK", openprecon.getOpenPrecondtion().toString());
-		openprecon.getOpenPrecondtion().setLiteralParameters(1, "?a");
-		assertEquals("CargoAt C1 ?a", openprecon.getOpenPrecondtion().toString());
-
-		//The problem here is that Actions LinkedList is empty
-		planner.searchSimilarInInitialState(openprecon);
-		assertEquals("CargoAt C1 SFO", openprecon.getOpenPrecondtion().toString());
-
-		//it is really hard to test it because Action LinkedList is empty
-//		assertEquals("In C1 ?p", unload.getPreconditions(0).toString());
-//		assertEquals("PlaneAt ?p SFO", unload.getPreconditions(1).toString());
-//		assertEquals("Cargo C1", unload.getPreconditions(2).toString());
-//		assertEquals("Plane ?p", unload.getPreconditions(3).toString());
-//		assertEquals("Airport SFO",unload.getPreconditions(4).toString());
-//		assertEquals("CargoAt C1 SFO",unload.getEffects(0).toString());
-//		assertEquals("In C1 ?p",unload.getEffects(1).toString());
-	}
 	
 	
 	@Test
@@ -544,8 +454,8 @@ public class TestParser
 
 		Parser parser = new Parser();
 		
-		String domainName = "Domain.txt";
-		String problemName = "Problem.txt";
+		String domainName = "CargoDomain.txt";
+		String problemName = "CargoProblem.txt";
 		parser.parseDomain(domainName);
 		parser.parseProblem(problemName);
 		
@@ -612,8 +522,8 @@ public class TestParser
 	@Test
 	public void testPlanner() throws FileNotFoundException
 	{
-		String domainName = "Domain.txt";
-		String problemName = "Problem.txt";
+		String domainName = "CargoDomain.txt";
+		String problemName = "CargoProblem.txt";
 
 		String name = "GoalState";
 		ArrayList<Literal> preconditions= null; //= new ArrayList <Literal>();

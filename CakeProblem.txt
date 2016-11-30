@@ -1,0 +1,5 @@
+  (:domain have-cake-and-eat-it-too)
+  
+  (:init  (Sells SM ingredients) (At home) (Ingredients ingredients)
+  (:goal (and (eaten cake) (eaten cake2))
+)
